@@ -1,0 +1,1837 @@
+{
+  "source": "https://apps.ualberta.ca/catalogue/course",
+  "subject_count": 305,
+  "science_count": 31,
+  "subjects": [
+    {
+      "slug": "abrod",
+      "code": "ABROD",
+      "name": "Abroad, Study Term",
+      "science": false
+    },
+    {
+      "slug": "acctg",
+      "code": "ACCTG",
+      "name": "Accounting",
+      "science": false
+    },
+    {
+      "slug": "admi",
+      "code": "ADMI",
+      "name": "FSJ - Administration",
+      "science": false
+    },
+    {
+      "slug": "adram",
+      "code": "ADRAM",
+      "name": "FSJ - Art dramatique",
+      "science": false
+    },
+    {
+      "slug": "afns",
+      "code": "AFNS",
+      "name": "Agricultural, Food and Nutritional Science",
+      "science": false
+    },
+    {
+      "slug": "agrmt",
+      "code": "AGRMT",
+      "name": "Agreement Formal (Registration)",
+      "science": false
+    },
+    {
+      "slug": "ai",
+      "code": "AI",
+      "name": "Artificial Intelligence",
+      "science": true
+    },
+    {
+      "slug": "aib",
+      "code": "AIB",
+      "name": "Alberta Institute Biomedicine",
+      "science": false
+    },
+    {
+      "slug": "ales",
+      "code": "ALES",
+      "name": "Agricultural, Life and Environmental Sciences",
+      "science": false
+    },
+    {
+      "slug": "als",
+      "code": "ALS",
+      "name": "FSJ - Anglais langue seconde",
+      "science": false
+    },
+    {
+      "slug": "an_sc",
+      "code": "AN SC",
+      "name": "Animal Science",
+      "science": false
+    },
+    {
+      "slug": "anat",
+      "code": "ANAT",
+      "name": "Anatomy",
+      "science": false
+    },
+    {
+      "slug": "anate",
+      "code": "ANATE",
+      "name": "FSJ - Anatomie",
+      "science": false
+    },
+    {
+      "slug": "angl",
+      "code": "ANGL",
+      "name": "FSJ - Anglais",
+      "science": false
+    },
+    {
+      "slug": "anthe",
+      "code": "ANTHE",
+      "name": "FSJ - Anthropologie",
+      "science": false
+    },
+    {
+      "slug": "anthr",
+      "code": "ANTHR",
+      "name": "Anthropology",
+      "science": false
+    },
+    {
+      "slug": "appex",
+      "code": "APPEX",
+      "name": "FSJ - Apprentissage Exp\u00e9rientiel",
+      "science": false
+    },
+    {
+      "slug": "arab",
+      "code": "ARAB",
+      "name": "Arabic",
+      "science": false
+    },
+    {
+      "slug": "arec",
+      "code": "AREC",
+      "name": "Agricultural and Resource Economics",
+      "science": false
+    },
+    {
+      "slug": "art",
+      "code": "ART",
+      "name": "Art",
+      "science": false
+    },
+    {
+      "slug": "arte",
+      "code": "ARTE",
+      "name": "FSJ - Arts",
+      "science": false
+    },
+    {
+      "slug": "asl",
+      "code": "ASL",
+      "name": "American Sign Language",
+      "science": false
+    },
+    {
+      "slug": "astro",
+      "code": "ASTRO",
+      "name": "Astronomy",
+      "science": true
+    },
+    {
+      "slug": "auacc",
+      "code": "AUACC",
+      "name": "Augustana Faculty - Accounting",
+      "science": false
+    },
+    {
+      "slug": "auart",
+      "code": "AUART",
+      "name": "Augustana Faculty - Art",
+      "science": false
+    },
+    {
+      "slug": "aubio",
+      "code": "AUBIO",
+      "name": "Augustana Faculty - Biology",
+      "science": false
+    },
+    {
+      "slug": "auche",
+      "code": "AUCHE",
+      "name": "Augustana Faculty - Chemistry",
+      "science": false
+    },
+    {
+      "slug": "aucla",
+      "code": "AUCLA",
+      "name": "Augustana Faculty - Classical Studies",
+      "science": false
+    },
+    {
+      "slug": "aucri",
+      "code": "AUCRI",
+      "name": "Augustana Faculty - Crime and Community",
+      "science": false
+    },
+    {
+      "slug": "aucsc",
+      "code": "AUCSC",
+      "name": "Augustana Faculty - Computing Science",
+      "science": false
+    },
+    {
+      "slug": "aucsl",
+      "code": "AUCSL",
+      "name": "Augustana Faculty - Community Service Learning",
+      "science": false
+    },
+    {
+      "slug": "audra",
+      "code": "AUDRA",
+      "name": "Augustana Faculty - Drama",
+      "science": false
+    },
+    {
+      "slug": "aueco",
+      "code": "AUECO",
+      "name": "Augustana Faculty - Economics",
+      "science": false
+    },
+    {
+      "slug": "auedc",
+      "code": "AUEDC",
+      "name": "Augustana Faculty - Educational Computing",
+      "science": false
+    },
+    {
+      "slug": "auefx",
+      "code": "AUEFX",
+      "name": "Augustana Faculty - Education Field Experience",
+      "science": false
+    },
+    {
+      "slug": "aueng",
+      "code": "AUENG",
+      "name": "Augustana Faculty - English",
+      "science": false
+    },
+    {
+      "slug": "auenv",
+      "code": "AUENV",
+      "name": "Augustana Faculty - Environmental Studies",
+      "science": false
+    },
+    {
+      "slug": "aueps",
+      "code": "AUEPS",
+      "name": "Augustana Faculty - Educational Psychology",
+      "science": false
+    },
+    {
+      "slug": "aufar",
+      "code": "AUFAR",
+      "name": "Augustana Faculty - Fine Arts",
+      "science": false
+    },
+    {
+      "slug": "aufre",
+      "code": "AUFRE",
+      "name": "Augustana Faculty - French",
+      "science": false
+    },
+    {
+      "slug": "augds",
+      "code": "AUGDS",
+      "name": "Augustana Faculty - Global and Development Studies",
+      "science": false
+    },
+    {
+      "slug": "auger",
+      "code": "AUGER",
+      "name": "Augustana Faculty - German",
+      "science": false
+    },
+    {
+      "slug": "auhis",
+      "code": "AUHIS",
+      "name": "Augustana Faculty - History",
+      "science": false
+    },
+    {
+      "slug": "auhum",
+      "code": "AUHUM",
+      "name": "Augustana Faculty - Humanities",
+      "science": false
+    },
+    {
+      "slug": "auids",
+      "code": "AUIDS",
+      "name": "Augustana Faculty - Interdisciplinary Studies",
+      "science": false
+    },
+    {
+      "slug": "auind",
+      "code": "AUIND",
+      "name": "Augustana Faculty - Indigenous Studies",
+      "science": false
+    },
+    {
+      "slug": "aulan",
+      "code": "AULAN",
+      "name": "Augustana Faculty - Language Studies",
+      "science": false
+    },
+    {
+      "slug": "aulat",
+      "code": "AULAT",
+      "name": "Augustana Faculty - Latin",
+      "science": false
+    },
+    {
+      "slug": "aumat",
+      "code": "AUMAT",
+      "name": "Augustana Faculty - Mathematics",
+      "science": false
+    },
+    {
+      "slug": "aumgt",
+      "code": "AUMGT",
+      "name": "Augustana Faculty - Management",
+      "science": false
+    },
+    {
+      "slug": "aumus",
+      "code": "AUMUS",
+      "name": "Augustana Faculty - Music",
+      "science": false
+    },
+    {
+      "slug": "aupac",
+      "code": "AUPAC",
+      "name": "Augustana Faculty - Physical Activity",
+      "science": false
+    },
+    {
+      "slug": "auphi",
+      "code": "AUPHI",
+      "name": "Augustana Faculty - Philosophy",
+      "science": false
+    },
+    {
+      "slug": "auphy",
+      "code": "AUPHY",
+      "name": "Augustana Faculty - Physics",
+      "science": false
+    },
+    {
+      "slug": "aupol",
+      "code": "AUPOL",
+      "name": "Augustana Faculty - Political Studies",
+      "science": false
+    },
+    {
+      "slug": "aupsy",
+      "code": "AUPSY",
+      "name": "Augustana Faculty - Psychology",
+      "science": false
+    },
+    {
+      "slug": "aurel",
+      "code": "AUREL",
+      "name": "Augustana Faculty - Religion",
+      "science": false
+    },
+    {
+      "slug": "ausca",
+      "code": "AUSCA",
+      "name": "Augustana Faculty - Scandinavian",
+      "science": false
+    },
+    {
+      "slug": "ausci",
+      "code": "AUSCI",
+      "name": "Augustana Faculty - Science",
+      "science": false
+    },
+    {
+      "slug": "auses",
+      "code": "AUSES",
+      "name": "Augustana Faculty - Sport and Exercise Science",
+      "science": false
+    },
+    {
+      "slug": "ausoc",
+      "code": "AUSOC",
+      "name": "Augustana Faculty - Sociology",
+      "science": false
+    },
+    {
+      "slug": "auspa",
+      "code": "AUSPA",
+      "name": "Augustana Faculty - Spanish",
+      "science": false
+    },
+    {
+      "slug": "aussc",
+      "code": "AUSSC",
+      "name": "Augustana Faculty - Social Sciences",
+      "science": false
+    },
+    {
+      "slug": "austa",
+      "code": "AUSTA",
+      "name": "Augustana Faculty - Statistics",
+      "science": false
+    },
+    {
+      "slug": "auwxp",
+      "code": "AUWXP",
+      "name": "Augustana Faculty - Work Experience",
+      "science": false
+    },
+    {
+      "slug": "b_law",
+      "code": "B LAW",
+      "name": "Business Law",
+      "science": false
+    },
+    {
+      "slug": "bioch",
+      "code": "BIOCH",
+      "name": "Biochemistry",
+      "science": false
+    },
+    {
+      "slug": "biocm",
+      "code": "BIOCM",
+      "name": "FSJ - Biochimie",
+      "science": false
+    },
+    {
+      "slug": "bioen",
+      "code": "BIOEN",
+      "name": "Bioresource Engineering",
+      "science": false
+    },
+    {
+      "slug": "bioin",
+      "code": "BIOIN",
+      "name": "Bioinformatics",
+      "science": true
+    },
+    {
+      "slug": "biol",
+      "code": "BIOL",
+      "name": "Biology",
+      "science": true
+    },
+    {
+      "slug": "biole",
+      "code": "BIOLE",
+      "name": "FSJ - Biologie",
+      "science": false
+    },
+    {
+      "slug": "bioph",
+      "code": "BIOPH",
+      "name": "Biophysics",
+      "science": true
+    },
+    {
+      "slug": "bme",
+      "code": "BME",
+      "name": "Biomedical Engineering",
+      "science": false
+    },
+    {
+      "slug": "bot",
+      "code": "BOT",
+      "name": "Botany",
+      "science": true
+    },
+    {
+      "slug": "btm",
+      "code": "BTM",
+      "name": "Business Technology Management",
+      "science": false
+    },
+    {
+      "slug": "buan",
+      "code": "BUAN",
+      "name": "Business Analytics",
+      "science": false
+    },
+    {
+      "slug": "buec",
+      "code": "BUEC",
+      "name": "Business Economics",
+      "science": false
+    },
+    {
+      "slug": "bus",
+      "code": "BUS",
+      "name": "Business",
+      "science": false
+    },
+    {
+      "slug": "c_lit",
+      "code": "C LIT",
+      "name": "Comparative Literature",
+      "science": false
+    },
+    {
+      "slug": "cats",
+      "code": "CATS",
+      "name": "Creative Arts Therapies",
+      "science": false
+    },
+    {
+      "slug": "ccals",
+      "code": "CCALS",
+      "name": "CCA - Anglais Langue Seconde",
+      "science": false
+    },
+    {
+      "slug": "cedul",
+      "code": "CEDUL",
+      "name": "FSJ - Certificat \u00c9ducation Leadership",
+      "science": false
+    },
+    {
+      "slug": "cell",
+      "code": "CELL",
+      "name": "Cell Biology",
+      "science": false
+    },
+    {
+      "slug": "ch_e",
+      "code": "CH E",
+      "name": "Chemical Engineering",
+      "science": false
+    },
+    {
+      "slug": "chem",
+      "code": "CHEM",
+      "name": "Chemistry",
+      "science": true
+    },
+    {
+      "slug": "chim",
+      "code": "CHIM",
+      "name": "FSJ - Chimie",
+      "science": false
+    },
+    {
+      "slug": "china",
+      "code": "CHINA",
+      "name": "Chinese",
+      "science": false
+    },
+    {
+      "slug": "chrtc",
+      "code": "CHRTC",
+      "name": "Christian Theology at St Joseph's College",
+      "science": false
+    },
+    {
+      "slug": "chrtp",
+      "code": "CHRTP",
+      "name": "Christian Theology at St Stephen's College",
+      "science": false
+    },
+    {
+      "slug": "civ_e",
+      "code": "CIV E",
+      "name": "Civil Engineering",
+      "science": false
+    },
+    {
+      "slug": "class",
+      "code": "CLASS",
+      "name": "Classics",
+      "science": false
+    },
+    {
+      "slug": "cme",
+      "code": "CME",
+      "name": "Chemical and Materials Engineering",
+      "science": false
+    },
+    {
+      "slug": "cmput",
+      "code": "CMPUT",
+      "name": "Computing Science",
+      "science": true
+    },
+    {
+      "slug": "comm",
+      "code": "COMM",
+      "name": "Communications and Technology",
+      "science": false
+    },
+    {
+      "slug": "csd",
+      "code": "CSD",
+      "name": "Communication Sciences and Disorders",
+      "science": false
+    },
+    {
+      "slug": "csl",
+      "code": "CSL",
+      "name": "Community Service-Learning",
+      "science": false
+    },
+    {
+      "slug": "csse",
+      "code": "CSSE",
+      "name": "FSJ - Certificat Sup\u00e9rieur Sciences de l'\u00c9ducation",
+      "science": false
+    },
+    {
+      "slug": "d_hyg",
+      "code": "D HYG",
+      "name": "Dental Hygiene",
+      "science": false
+    },
+    {
+      "slug": "da",
+      "code": "DA",
+      "name": "Dental Assisting",
+      "science": false
+    },
+    {
+      "slug": "dac",
+      "code": "DAC",
+      "name": "Dance Activity",
+      "science": false
+    },
+    {
+      "slug": "dance",
+      "code": "DANCE",
+      "name": "Dance",
+      "science": false
+    },
+    {
+      "slug": "data",
+      "code": "DATA",
+      "name": "Data Science",
+      "science": true
+    },
+    {
+      "slug": "dds",
+      "code": "DDS",
+      "name": "Dentistry",
+      "science": false
+    },
+    {
+      "slug": "dent",
+      "code": "DENT",
+      "name": "Dentistry",
+      "science": false
+    },
+    {
+      "slug": "des",
+      "code": "DES",
+      "name": "Design",
+      "science": false
+    },
+    {
+      "slug": "det",
+      "code": "DET",
+      "name": "FSJ - Doctorat en \u00c9tudes Transdisciplinaires",
+      "science": false
+    },
+    {
+      "slug": "devdu",
+      "code": "DEVDU",
+      "name": "FSJ - Developpement Durable",
+      "science": false
+    },
+    {
+      "slug": "dh",
+      "code": "DH",
+      "name": "Digital Humanities",
+      "science": false
+    },
+    {
+      "slug": "drama",
+      "code": "DRAMA",
+      "name": "Drama",
+      "science": false
+    },
+    {
+      "slug": "eap",
+      "code": "EAP",
+      "name": "English for Academic Purposes",
+      "science": false
+    },
+    {
+      "slug": "eas",
+      "code": "EAS",
+      "name": "Earth and Atmospheric Sciences",
+      "science": true
+    },
+    {
+      "slug": "easia",
+      "code": "EASIA",
+      "name": "East Asian Studies",
+      "science": false
+    },
+    {
+      "slug": "ece",
+      "code": "ECE",
+      "name": "Electrical and Computer Engineering",
+      "science": false
+    },
+    {
+      "slug": "econ",
+      "code": "ECON",
+      "name": "Economics",
+      "science": false
+    },
+    {
+      "slug": "econe",
+      "code": "ECONE",
+      "name": "FSJ - Economie",
+      "science": false
+    },
+    {
+      "slug": "edct",
+      "code": "EDCT",
+      "name": "Education - Career Technology Studies",
+      "science": false
+    },
+    {
+      "slug": "edel",
+      "code": "EDEL",
+      "name": "Education - Elementary",
+      "science": false
+    },
+    {
+      "slug": "edes",
+      "code": "EDES",
+      "name": "Education - Elementary and Secondary",
+      "science": false
+    },
+    {
+      "slug": "edfx",
+      "code": "EDFX",
+      "name": "Education - Field Experience",
+      "science": false
+    },
+    {
+      "slug": "edhs",
+      "code": "EDHS",
+      "name": "Master of Education in Health Science Education",
+      "science": false
+    },
+    {
+      "slug": "edit",
+      "code": "EDIT",
+      "name": "Education - Instructional Technology",
+      "science": false
+    },
+    {
+      "slug": "edps",
+      "code": "EDPS",
+      "name": "Education - Policy Studies",
+      "science": false
+    },
+    {
+      "slug": "edpy",
+      "code": "EDPY",
+      "name": "Education - Psychology",
+      "science": false
+    },
+    {
+      "slug": "edse",
+      "code": "EDSE",
+      "name": "Education - Secondary",
+      "science": false
+    },
+    {
+      "slug": "edsl",
+      "code": "EDSL",
+      "name": "Education - School Leadership",
+      "science": false
+    },
+    {
+      "slug": "edst",
+      "code": "EDST",
+      "name": "Education - Education Studies",
+      "science": false
+    },
+    {
+      "slug": "edu",
+      "code": "EDU",
+      "name": "Education",
+      "science": false
+    },
+    {
+      "slug": "edu_f",
+      "code": "EDU F",
+      "name": "FSJ - Education - Fondements",
+      "science": false
+    },
+    {
+      "slug": "edu_m",
+      "code": "EDU M",
+      "name": "FSJ - Education - Methodologie et Curriculum",
+      "science": false
+    },
+    {
+      "slug": "edu_p",
+      "code": "EDU P",
+      "name": "FSJ - Education - Psychologie",
+      "science": false
+    },
+    {
+      "slug": "edu_s",
+      "code": "EDU S",
+      "name": "FSJ - Education - Stage",
+      "science": false
+    },
+    {
+      "slug": "en_ph",
+      "code": "EN PH",
+      "name": "Engineering Physics",
+      "science": true
+    },
+    {
+      "slug": "encmp",
+      "code": "ENCMP",
+      "name": "Engineering, Computer",
+      "science": false
+    },
+    {
+      "slug": "encs",
+      "code": "ENCS",
+      "name": "Environmental and Conservation Sciences",
+      "science": false
+    },
+    {
+      "slug": "eng_m",
+      "code": "ENG M",
+      "name": "Engineering Management",
+      "science": false
+    },
+    {
+      "slug": "engg",
+      "code": "ENGG",
+      "name": "Engineering, General",
+      "science": false
+    },
+    {
+      "slug": "engl",
+      "code": "ENGL",
+      "name": "English",
+      "science": false
+    },
+    {
+      "slug": "ent",
+      "code": "ENT",
+      "name": "Entomology",
+      "science": true
+    },
+    {
+      "slug": "env_e",
+      "code": "ENV E",
+      "name": "Environmental Engineering",
+      "science": false
+    },
+    {
+      "slug": "epe",
+      "code": "EPE",
+      "name": "CCA - \u00c9ducation \u00e0 la petite enfance",
+      "science": false
+    },
+    {
+      "slug": "et_re",
+      "code": "ET RE",
+      "name": "FSJ - Etudes de la religion",
+      "science": false
+    },
+    {
+      "slug": "etcan",
+      "code": "ETCAN",
+      "name": "FSJ - Etudes canadiennes",
+      "science": false
+    },
+    {
+      "slug": "etin",
+      "code": "ETIN",
+      "name": "FSJ - Etudes interdisciplinaires",
+      "science": false
+    },
+    {
+      "slug": "exch",
+      "code": "EXCH",
+      "name": "Exchange Program",
+      "science": false
+    },
+    {
+      "slug": "f_med",
+      "code": "F MED",
+      "name": "Family Medicine",
+      "science": false
+    },
+    {
+      "slug": "fin",
+      "code": "FIN",
+      "name": "Finance",
+      "science": false
+    },
+    {
+      "slug": "fine",
+      "code": "FINE",
+      "name": "Finances",
+      "science": false
+    },
+    {
+      "slug": "folk",
+      "code": "FOLK",
+      "name": "Folklore",
+      "science": false
+    },
+    {
+      "slug": "forec",
+      "code": "FOREC",
+      "name": "Forest Economics",
+      "science": false
+    },
+    {
+      "slug": "franc",
+      "code": "FRANC",
+      "name": "FSJ - Fran\u00e7ais",
+      "science": false
+    },
+    {
+      "slug": "fren",
+      "code": "FREN",
+      "name": "French Language and Literature",
+      "science": false
+    },
+    {
+      "slug": "fs",
+      "code": "FS",
+      "name": "Film Studies",
+      "science": false
+    },
+    {
+      "slug": "geneq",
+      "code": "GENEQ",
+      "name": "FSJ - G\u00e9n\u00e9tique",
+      "science": false
+    },
+    {
+      "slug": "genet",
+      "code": "GENET",
+      "name": "Genetics",
+      "science": true
+    },
+    {
+      "slug": "genie",
+      "code": "GENIE",
+      "name": "FSJ - Science en G\u00e9nie",
+      "science": false
+    },
+    {
+      "slug": "geoph",
+      "code": "GEOPH",
+      "name": "Geophysics",
+      "science": true
+    },
+    {
+      "slug": "germ",
+      "code": "GERM",
+      "name": "German",
+      "science": false
+    },
+    {
+      "slug": "greek",
+      "code": "GREEK",
+      "name": "Greek",
+      "science": false
+    },
+    {
+      "slug": "gsj",
+      "code": "GSJ",
+      "name": "Gender and Social Justice",
+      "science": false
+    },
+    {
+      "slug": "gtotc",
+      "code": "GTOTC",
+      "name": "CCA - Gestion touristique",
+      "science": false
+    },
+    {
+      "slug": "hadvc",
+      "code": "HADVC",
+      "name": "History of Art, Design, and Visual Culture",
+      "science": false
+    },
+    {
+      "slug": "he_ed",
+      "code": "HE ED",
+      "name": "Health Education",
+      "science": false
+    },
+    {
+      "slug": "hebr",
+      "code": "HEBR",
+      "name": "Hebrew",
+      "science": false
+    },
+    {
+      "slug": "hecol",
+      "code": "HECOL",
+      "name": "Human Ecology",
+      "science": false
+    },
+    {
+      "slug": "hgeo",
+      "code": "HGEO",
+      "name": "Human Geography",
+      "science": false
+    },
+    {
+      "slug": "hist",
+      "code": "HIST",
+      "name": "History",
+      "science": false
+    },
+    {
+      "slug": "histe",
+      "code": "HISTE",
+      "name": "FSJ - Histoire",
+      "science": false
+    },
+    {
+      "slug": "hlth",
+      "code": "HLTH",
+      "name": "Health Sciences",
+      "science": false
+    },
+    {
+      "slug": "hume",
+      "code": "HUME",
+      "name": "FSJ - Humanit\u00e9s",
+      "science": false
+    },
+    {
+      "slug": "imin",
+      "code": "IMIN",
+      "name": "Immunology and Infection",
+      "science": true
+    },
+    {
+      "slug": "imine",
+      "code": "IMINE",
+      "name": "FSJ - Immunologie",
+      "science": false
+    },
+    {
+      "slug": "infor",
+      "code": "INFOR",
+      "name": "FSJ - Informatique",
+      "science": false
+    },
+    {
+      "slug": "int_d",
+      "code": "INT D",
+      "name": "Interdisciplinary Undergraduate & Graduate Courses",
+      "science": true
+    },
+    {
+      "slug": "ipg",
+      "code": "IPG",
+      "name": "Integrated Petroleum Geosciences",
+      "science": true
+    },
+    {
+      "slug": "irish",
+      "code": "IRISH",
+      "name": "Irish Language and Culture",
+      "science": false
+    },
+    {
+      "slug": "ital",
+      "code": "ITAL",
+      "name": "Italian",
+      "science": false
+    },
+    {
+      "slug": "japan",
+      "code": "JAPAN",
+      "name": "Japanese",
+      "science": false
+    },
+    {
+      "slug": "kin",
+      "code": "KIN",
+      "name": "Kinesiology",
+      "science": false
+    },
+    {
+      "slug": "korea",
+      "code": "KOREA",
+      "name": "Korean",
+      "science": false
+    },
+    {
+      "slug": "krls",
+      "code": "KRLS",
+      "name": "Kinesiology, Recreation, Leisure and Sport",
+      "science": false
+    },
+    {
+      "slug": "ksr",
+      "code": "KSR",
+      "name": "Kinesiology, Sport, and Recreation",
+      "science": false
+    },
+    {
+      "slug": "la_st",
+      "code": "LA ST",
+      "name": "Latin American Studies",
+      "science": false
+    },
+    {
+      "slug": "labmp",
+      "code": "LABMP",
+      "name": "Laboratory Medicine and Pathology",
+      "science": false
+    },
+    {
+      "slug": "latin",
+      "code": "LATIN",
+      "name": "Latin",
+      "science": false
+    },
+    {
+      "slug": "law",
+      "code": "LAW",
+      "name": "Law",
+      "science": false
+    },
+    {
+      "slug": "ling",
+      "code": "LING",
+      "name": "Linguistics",
+      "science": false
+    },
+    {
+      "slug": "lingq",
+      "code": "LINGQ",
+      "name": "FSJ - Linguistique",
+      "science": false
+    },
+    {
+      "slug": "lis",
+      "code": "LIS",
+      "name": "Library and Information Studies",
+      "science": false
+    },
+    {
+      "slug": "litt",
+      "code": "LITT",
+      "name": "FSJ - Litt\u00e9rature",
+      "science": false
+    },
+    {
+      "slug": "m_edu",
+      "code": "M EDU",
+      "name": "FSJ - Ma\u00eetrise \u00e8s sciences de l'\u00e9ducation",
+      "science": false
+    },
+    {
+      "slug": "m_reg",
+      "code": "M REG",
+      "name": "Maintaining Registration",
+      "science": false
+    },
+    {
+      "slug": "ma_ph",
+      "code": "MA PH",
+      "name": "Mathematical Physics",
+      "science": true
+    },
+    {
+      "slug": "ma_sc",
+      "code": "MA SC",
+      "name": "Marine Science",
+      "science": true
+    },
+    {
+      "slug": "mace",
+      "code": "MACE",
+      "name": "Community Engagement",
+      "science": false
+    },
+    {
+      "slug": "mafsj",
+      "code": "MAFSJ",
+      "name": "FSJ - Maitrise en Art Facult\u00e9 Saint-Jean",
+      "science": false
+    },
+    {
+      "slug": "mark",
+      "code": "MARK",
+      "name": "Marketing",
+      "science": false
+    },
+    {
+      "slug": "mat_e",
+      "code": "MAT E",
+      "name": "Materials Engineering",
+      "science": false
+    },
+    {
+      "slug": "math",
+      "code": "MATH",
+      "name": "Mathematics",
+      "science": true
+    },
+    {
+      "slug": "mathq",
+      "code": "MATHQ",
+      "name": "FSJ - Math\u00e9matiques",
+      "science": false
+    },
+    {
+      "slug": "mctr",
+      "code": "MCTR",
+      "name": "Mechatronics & Robotics Engineering",
+      "science": false
+    },
+    {
+      "slug": "mdgen",
+      "code": "MDGEN",
+      "name": "Medical Genetics",
+      "science": false
+    },
+    {
+      "slug": "mec_e",
+      "code": "MEC E",
+      "name": "Mechanical Engineering",
+      "science": false
+    },
+    {
+      "slug": "med",
+      "code": "MED",
+      "name": "Medicine",
+      "science": false
+    },
+    {
+      "slug": "medph",
+      "code": "MEDPH",
+      "name": "Medical Physics",
+      "science": false
+    },
+    {
+      "slug": "mgtsc",
+      "code": "MGTSC",
+      "name": "Management Science",
+      "science": false
+    },
+    {
+      "slug": "micrb",
+      "code": "MICRB",
+      "name": "Microbiology",
+      "science": true
+    },
+    {
+      "slug": "micre",
+      "code": "MICRE",
+      "name": "FSJ - Microbiologie",
+      "science": false
+    },
+    {
+      "slug": "min_e",
+      "code": "MIN E",
+      "name": "Mining Engineering",
+      "science": false
+    },
+    {
+      "slug": "mint",
+      "code": "MINT",
+      "name": "Master of Internetworking",
+      "science": true
+    },
+    {
+      "slug": "mlcs",
+      "code": "MLCS",
+      "name": "Modern Languages and Cultural Studies",
+      "science": false
+    },
+    {
+      "slug": "mlsci",
+      "code": "MLSCI",
+      "name": "Medical Laboratory Science",
+      "science": false
+    },
+    {
+      "slug": "mm",
+      "code": "MM",
+      "name": "Multimedia",
+      "science": true
+    },
+    {
+      "slug": "mma",
+      "code": "MMA",
+      "name": "Master's in Management Analytics",
+      "science": false
+    },
+    {
+      "slug": "mmi",
+      "code": "MMI",
+      "name": "Medical Microbiology and Immunology",
+      "science": false
+    },
+    {
+      "slug": "msfsj",
+      "code": "MSFSJ",
+      "name": "FSJ - Ma\u00eetrise en Sciences Facult\u00e9 Saint-Jean",
+      "science": false
+    },
+    {
+      "slug": "mst",
+      "code": "MST",
+      "name": "Media Studies",
+      "science": false
+    },
+    {
+      "slug": "music",
+      "code": "MUSIC",
+      "name": "Music",
+      "science": false
+    },
+    {
+      "slug": "musiq",
+      "code": "MUSIQ",
+      "name": "FSJ - Musique",
+      "science": false
+    },
+    {
+      "slug": "neuro",
+      "code": "NEURO",
+      "name": "Neuroscience and Mental Health Institute",
+      "science": false
+    },
+    {
+      "slug": "norse",
+      "code": "NORSE",
+      "name": "Old Norse",
+      "science": false
+    },
+    {
+      "slug": "norw",
+      "code": "NORW",
+      "name": "Norwegian",
+      "science": false
+    },
+    {
+      "slug": "ns",
+      "code": "NS",
+      "name": "Native Studies",
+      "science": false
+    },
+    {
+      "slug": "nu_fs",
+      "code": "NU FS",
+      "name": "Nutrition and Food Sciences",
+      "science": false
+    },
+    {
+      "slug": "nurs",
+      "code": "NURS",
+      "name": "Nursing",
+      "science": false
+    },
+    {
+      "slug": "nutr",
+      "code": "NUTR",
+      "name": "Nutrition",
+      "science": false
+    },
+    {
+      "slug": "ob_gy",
+      "code": "OB GY",
+      "name": "Obstetrics and Gynaecology",
+      "science": false
+    },
+    {
+      "slug": "obiol",
+      "code": "OBIOL",
+      "name": "Oral Biology",
+      "science": false
+    },
+    {
+      "slug": "occth",
+      "code": "OCCTH",
+      "name": "Occupational Therapy",
+      "science": false
+    },
+    {
+      "slug": "om",
+      "code": "OM",
+      "name": "Operations Management",
+      "science": false
+    },
+    {
+      "slug": "oncol",
+      "code": "ONCOL",
+      "name": "Oncology",
+      "science": false
+    },
+    {
+      "slug": "ophth",
+      "code": "OPHTH",
+      "name": "Ophthalmology",
+      "science": false
+    },
+    {
+      "slug": "paed",
+      "code": "PAED",
+      "name": "Paediatrics",
+      "science": false
+    },
+    {
+      "slug": "paleo",
+      "code": "PALEO",
+      "name": "Paleontology",
+      "science": true
+    },
+    {
+      "slug": "pcole",
+      "code": "PCOLE",
+      "name": "FSJ - Pharmacologie",
+      "science": false
+    },
+    {
+      "slug": "pet_e",
+      "code": "PET E",
+      "name": "Petroleum Engineering",
+      "science": false
+    },
+    {
+      "slug": "pgde",
+      "code": "PGDE",
+      "name": "Postgraduate Dental Education",
+      "science": false
+    },
+    {
+      "slug": "pgme",
+      "code": "PGME",
+      "name": "Postgraduate Medical Education",
+      "science": false
+    },
+    {
+      "slug": "pharm",
+      "code": "PHARM",
+      "name": "Pharmacy",
+      "science": false
+    },
+    {
+      "slug": "phil",
+      "code": "PHIL",
+      "name": "Philosophy",
+      "science": false
+    },
+    {
+      "slug": "phile",
+      "code": "PHILE",
+      "name": "FSJ - Philosophie",
+      "science": false
+    },
+    {
+      "slug": "phys",
+      "code": "PHYS",
+      "name": "Physics",
+      "science": true
+    },
+    {
+      "slug": "physe",
+      "code": "PHYSE",
+      "name": "FSJ - Physiologie",
+      "science": false
+    },
+    {
+      "slug": "physl",
+      "code": "PHYSL",
+      "name": "Physiology",
+      "science": false
+    },
+    {
+      "slug": "physq",
+      "code": "PHYSQ",
+      "name": "FSJ - Physique",
+      "science": false
+    },
+    {
+      "slug": "pipon",
+      "code": "PIPON",
+      "name": "Pipon",
+      "science": false
+    },
+    {
+      "slug": "pl_sc",
+      "code": "PL SC",
+      "name": "Plant Science",
+      "science": false
+    },
+    {
+      "slug": "plan",
+      "code": "PLAN",
+      "name": "Urban and Regional Planning",
+      "science": true
+    },
+    {
+      "slug": "pmcol",
+      "code": "PMCOL",
+      "name": "Pharmacology",
+      "science": false
+    },
+    {
+      "slug": "pol_s",
+      "code": "POL S",
+      "name": "Political Science",
+      "science": false
+    },
+    {
+      "slug": "polsh",
+      "code": "POLSH",
+      "name": "Polish",
+      "science": false
+    },
+    {
+      "slug": "port",
+      "code": "PORT",
+      "name": "Portuguese",
+      "science": false
+    },
+    {
+      "slug": "psstc",
+      "code": "PSSTC",
+      "name": "CCA - Pr\u00e9pos\u00e9 aux soins de sant\u00e9",
+      "science": false
+    },
+    {
+      "slug": "psyce",
+      "code": "PSYCE",
+      "name": "FSJ - Psychologie",
+      "science": false
+    },
+    {
+      "slug": "psych",
+      "code": "PSYCH",
+      "name": "Psychology",
+      "science": true
+    },
+    {
+      "slug": "psyci",
+      "code": "PSYCI",
+      "name": "Psychiatry",
+      "science": false
+    },
+    {
+      "slug": "pther",
+      "code": "PTHER",
+      "name": "Physical Therapy",
+      "science": false
+    },
+    {
+      "slug": "r_soc",
+      "code": "R SOC",
+      "name": "Rural Sociology",
+      "science": false
+    },
+    {
+      "slug": "raddi",
+      "code": "RADDI",
+      "name": "Radiology and Diagnostic Imaging",
+      "science": false
+    },
+    {
+      "slug": "radth",
+      "code": "RADTH",
+      "name": "Radiation Therapy",
+      "science": false
+    },
+    {
+      "slug": "red",
+      "code": "RED",
+      "name": "Real Estate Development",
+      "science": false
+    },
+    {
+      "slug": "rehab",
+      "code": "REHAB",
+      "name": "Rehabilitation Medicine",
+      "science": false
+    },
+    {
+      "slug": "relig",
+      "code": "RELIG",
+      "name": "Religious Studies",
+      "science": false
+    },
+    {
+      "slug": "ren_r",
+      "code": "REN R",
+      "name": "Renewable Resources",
+      "science": false
+    },
+    {
+      "slug": "rls",
+      "code": "RLS",
+      "name": "Recreation and Leisure Studies",
+      "science": false
+    },
+    {
+      "slug": "rsch",
+      "code": "RSCH",
+      "name": "Research",
+      "science": false
+    },
+    {
+      "slug": "russ",
+      "code": "RUSS",
+      "name": "Russian",
+      "science": false
+    },
+    {
+      "slug": "sansk",
+      "code": "SANSK",
+      "name": "Sanskrit",
+      "science": false
+    },
+    {
+      "slug": "sc_inf",
+      "code": "SC INF",
+      "name": "Sciences infirmi\u00e8res",
+      "science": false
+    },
+    {
+      "slug": "sc_po",
+      "code": "SC PO",
+      "name": "FSJ - Science politique",
+      "science": false
+    },
+    {
+      "slug": "scand",
+      "code": "SCAND",
+      "name": "Scandinavian",
+      "science": false
+    },
+    {
+      "slug": "sci",
+      "code": "SCI",
+      "name": "Science",
+      "science": true
+    },
+    {
+      "slug": "scsoc",
+      "code": "SCSOC",
+      "name": "FSJ - Sciences sociales",
+      "science": false
+    },
+    {
+      "slug": "scsp",
+      "code": "SCSP",
+      "name": "FSJ - Sciences socio-politiques",
+      "science": false
+    },
+    {
+      "slug": "sem",
+      "code": "SEM",
+      "name": "Strategy, Entrepreneurship and Management",
+      "science": false
+    },
+    {
+      "slug": "slav",
+      "code": "SLAV",
+      "name": "Slavic and East European Studies",
+      "science": false
+    },
+    {
+      "slug": "soc",
+      "code": "SOC",
+      "name": "Sociology",
+      "science": false
+    },
+    {
+      "slug": "socie",
+      "code": "SOCIE",
+      "name": "FSJ - Sociologie",
+      "science": false
+    },
+    {
+      "slug": "span",
+      "code": "SPAN",
+      "name": "Spanish",
+      "science": false
+    },
+    {
+      "slug": "sph",
+      "code": "SPH",
+      "name": "School of Public Health",
+      "science": false
+    },
+    {
+      "slug": "sprit",
+      "code": "SPRIT",
+      "name": "Spirituality and Multi-Faith Theologies",
+      "science": false
+    },
+    {
+      "slug": "stat",
+      "code": "STAT",
+      "name": "Statistics",
+      "science": true
+    },
+    {
+      "slug": "statq",
+      "code": "STATQ",
+      "name": "FSJ - Statistique",
+      "science": false
+    },
+    {
+      "slug": "sts",
+      "code": "STS",
+      "name": "Science, Technology, and Society",
+      "science": false
+    },
+    {
+      "slug": "surg",
+      "code": "SURG",
+      "name": "Surgery",
+      "science": false
+    },
+    {
+      "slug": "sust",
+      "code": "SUST",
+      "name": "Sustainability",
+      "science": false
+    },
+    {
+      "slug": "swed",
+      "code": "SWED",
+      "name": "Swedish",
+      "science": false
+    },
+    {
+      "slug": "t_des",
+      "code": "T DES",
+      "name": "Theatre Design",
+      "science": false
+    },
+    {
+      "slug": "taaco",
+      "code": "TAACO",
+      "name": "CCA - Comptabilit\u00e9",
+      "science": false
+    },
+    {
+      "slug": "taafi",
+      "code": "TAAFI",
+      "name": "CCA - Finance",
+      "science": false
+    },
+    {
+      "slug": "taamg",
+      "code": "TAAMG",
+      "name": "CCA - Management",
+      "science": false
+    },
+    {
+      "slug": "taamk",
+      "code": "TAAMK",
+      "name": "CCA - Marketing",
+      "science": false
+    },
+    {
+      "slug": "taarh",
+      "code": "TAARH",
+      "name": "CCA - Ressources humaines",
+      "science": false
+    },
+    {
+      "slug": "taatc",
+      "code": "TAATC",
+      "name": "CCA - Tronc commun",
+      "science": false
+    },
+    {
+      "slug": "takwa",
+      "code": "TAKWA",
+      "name": "Takw\u00e2kin",
+      "science": false
+    },
+    {
+      "slug": "thes",
+      "code": "THES",
+      "name": "Thesis",
+      "science": false
+    },
+    {
+      "slug": "ukr",
+      "code": "UKR",
+      "name": "Ukrainian",
+      "science": false
+    },
+    {
+      "slug": "univ",
+      "code": "UNIV",
+      "name": "University",
+      "science": false
+    },
+    {
+      "slug": "ursch",
+      "code": "URSCH",
+      "name": "Undergraduate Research",
+      "science": false
+    },
+    {
+      "slug": "wgs",
+      "code": "WGS",
+      "name": "Women's and Gender Studies",
+      "science": false
+    },
+    {
+      "slug": "wkexp",
+      "code": "WKEXP",
+      "name": "Work Experience",
+      "science": true
+    },
+    {
+      "slug": "write",
+      "code": "WRITE",
+      "name": "Write (Creative Writing)",
+      "science": false
+    },
+    {
+      "slug": "wrs",
+      "code": "WRS",
+      "name": "Writing Studies",
+      "science": false
+    },
+    {
+      "slug": "zool",
+      "code": "ZOOL",
+      "name": "Zoology",
+      "science": true
+    },
+    {
+      "slug": "zoole",
+      "code": "ZOOLE",
+      "name": "FSJ - Zoologie",
+      "science": false
+    }
+  ]
+}
