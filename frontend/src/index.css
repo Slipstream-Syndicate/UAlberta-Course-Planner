@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/*
+ * Print view (CLAUDE.md "Export / printable view").
+ *
+ * No PDF library: hide the app chrome and let the browser's native
+ * print-to-PDF do the export. The on-screen node-and-edge graph is replaced by
+ * an indented text outline, because graphs do not survive pagination --
+ * crossing lines and nodes cut in half at page breaks -- while outlines do.
+ *
+ * What prints is deliberately not a subset of what shows: the confidence flag,
+ * the raw prerequisite text for anything not fully parsed, and the "not
+ * official advising" line all print too. On paper the reader has lost the easy
+ * "can I trust this?" check they get glancing at the live app.
+ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  body {
+    background: #fff;
+    font-size: 11pt;
+  }
+
+  .print-page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Keep a requirement and its children on the same page where possible. */
+  .print-outline li {
+    break-inside: avoid;
+  }
+
+  a[href]::after {
+    content: '';
+  }
+
+  /*
+   * Tree guide lines.
+   *
+   * On screen the nesting is carried by left borders and colour. Indentation
+   * alone does not survive on paper: by the third level a reader cannot tell
+   * which "ANY ONE of the following" a course hangs off, which is precisely
+   * the question the printout exists to answer.
+   *
+   * Each nested item draws its own elbow -- a vertical segment plus a short
+   * horizontal stub -- rather than the parent drawing one long rule. That way
+   * the last child's vertical stops at its own elbow instead of overshooting
+   * past the end of the list, and a list broken across a page break still
+   * renders correct guides on both pages.
+   */
+  /* Scoped to .print-tree so the plain bulleted lists elsewhere in the
+     printout ("Shortest remaining path", "Notes") keep their own markers. */
+  .print-tree ul {
+    margin: 0;
+    padding-left: 1.05rem;
+    list-style: none;
+  }
+
+  .print-tree > ul {
+    padding-left: 0;
+  }
+
+  .print-tree ul ul > li {
+    position: relative;
+    padding-left: 0.35rem;
+  }
+
+  /* Vertical run, from the top of the item down to the next sibling. */
+  .print-tree ul ul > li::before {
+    content: '';
+    position: absolute;
+    left: -0.35rem;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid #64748b;
+  }
+
+  /* The last child's vertical stops at its own elbow, closing the branch. */
+  .print-tree ul ul > li:last-child::before {
+    bottom: auto;
+    height: 0.72em;
+  }
+
+  /* Horizontal stub joining the vertical run to the item's text. */
+  .print-tree ul ul > li::after {
+    content: '';
+    position: absolute;
+    left: -0.35rem;
+    top: 0.72em;
+    width: 0.6rem;
+    border-top: 1px solid #64748b;
+  }
+
+  /* "which itself needs:" -- a caption introducing a sub-tree, not a
+     requirement, so it sits outside the list and gets no elbow. */
+  .print-tree .print-caption {
+    font-style: italic;
+    font-size: 0.92em;
+    margin-left: 0.35rem;
+  }
+
+  /* Borders are rendered by default, but some browsers drop them along with
+     backgrounds when "print background graphics" is off. Ask for them. */
+  .print-outline,
+  .print-tree {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+.print-only {
+  display: none;
+}

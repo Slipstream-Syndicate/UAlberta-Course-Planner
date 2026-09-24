@@ -1,0 +1,29 @@
+{
+  "name": "cmput-prereq-explorer",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "sync-data": "node scripts/sync-data.mjs",
+    "dev": "npm run sync-data && vite",
+    "build": "npm run sync-data && vite build",
+    "preview": "vite preview",
+    "test": "npm run sync-data && npm run test:unit && npm run test:render && npm run verify",
+    "test:unit": "node src/lib/evalEngine.test.js && node src/lib/usePrintTitle.test.js",
+    "test:render": "node --import ./scripts/jsx-loader-register.mjs src/App.render.test.js",
+    "verify": "node src/lib/verifyDataset.js"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "autoprefixer": "^10.4.20",
+    "esbuild": "^0.28.2",
+    "jsdom": "^30.0.1",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.14",
+    "vite": "^8.2.2"
+  }
+}

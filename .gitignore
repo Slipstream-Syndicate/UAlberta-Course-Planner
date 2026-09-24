@@ -1,0 +1,27 @@
+# Generated data IS committed -- see below for why it is not ignored.
+#
+# data/courses.json and data/courses_raw.json are build outputs, but they are
+# also the product: the deployed site is a static bundle plus that JSON. A
+# host like Netlify builds from the git checkout, so ignoring them means the
+# build fails at `npm run sync-data`. The only alternative -- running the
+# scraper during every deploy -- would hit apps.ualberta.ca on every push,
+# which the scraper-etiquette rule in CLAUDE.md rules out.
+#
+# Committing courses_raw.json too (220K) means the parser can be re-run and
+# iterated on without re-scraping the university's site at all.
+#
+# Still regenerate BOTH from scratch on every re-scrape; never hand-edit them.
+
+# 6MB of cached page HTML -- a local dev convenience, not part of the product.
+data/html_cache/
+
+# Copied from data/courses.json at build time by frontend/scripts/sync-data.mjs.
+frontend/public/courses.json
+
+__pycache__/
+*.pyc
+venv/
+.venv/
+node_modules/
+dist/
+.DS_Store
