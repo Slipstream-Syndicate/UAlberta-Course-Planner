@@ -165,7 +165,8 @@ def main():
         if re.search(r"\b(?:pre-?requisite|co-?requisite)s?\b", body, re.I):
             label_leftovers[re.sub(r"\s+", " ", body)[:80]].add(code)
 
-    rank = lambda d: sorted(d.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+    def rank(d):
+        return sorted(d.items(), key=lambda kv: (-len(kv[1]), kv[0]))
 
     print("=" * 74)
     print("OUTLIER REPORT -- {} courses, {} subjects".format(

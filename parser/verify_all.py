@@ -117,6 +117,14 @@ def check_schema(courses, known):
                         problems.append("LEVEL_MIN has non-int min_level")
                     if not n.get("subject"):
                         problems.append("LEVEL_MIN has no subject")
+                    # Optional: a department spanning several subject codes.
+                    subs = n.get("subjects")
+                    if subs is not None and (
+                            not isinstance(subs, list) or not subs
+                            or not all(isinstance(s, str) and s for s in subs)
+                            or n.get("subject") not in subs):
+                        problems.append("LEVEL_MIN `subjects` must be a non-empty "
+                                        "list of codes including `subject`")
                 else:
                     kids = n.get("children")
                     if not isinstance(kids, list) or len(kids) < 2:
@@ -238,7 +246,7 @@ def check_honesty(courses):
         raw = c["prerequisites_text"]
         if not raw:
             continue
-        in_text = set(_codes_in(normalize_spelled_subjects(raw)))
+        in_text = set(_codes_in(normalize_spelled_subjects(raw), c["subject"]))
         in_tree = tree_course_codes(c["prerequisite_tree"])
 
         invented = in_tree - in_text

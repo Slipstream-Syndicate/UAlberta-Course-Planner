@@ -55,7 +55,7 @@ def main():
         if not raw:
             continue
         checked += 1
-        in_text = set(_codes_in(normalize_spelled_subjects(raw)))
+        in_text = set(_codes_in(normalize_spelled_subjects(raw), c["subject"]))
         in_tree = tree_codes(c["prerequisite_tree"])
         dropped = in_text - in_tree
         invented = in_tree - in_text

@@ -1,7 +1,39 @@
 {
-  "schema_version": 1,
-  "source": "https://apps.ualberta.ca/catalogue/course/cmput",
-  "subject": "CMPUT",
+  "schema_version": 2,
+  "source": "https://apps.ualberta.ca/catalogue/course",
+  "subjects": [
+    "AI",
+    "ASTRO",
+    "BIOIN",
+    "BIOL",
+    "BIOPH",
+    "BOT",
+    "CHEM",
+    "CMPUT",
+    "DATA",
+    "EAS",
+    "EN PH",
+    "ENT",
+    "GENET",
+    "GEOPH",
+    "IMIN",
+    "INT D",
+    "IPG",
+    "MA PH",
+    "MA SC",
+    "MATH",
+    "MICRB",
+    "MINT",
+    "MM",
+    "PALEO",
+    "PHYS",
+    "PLAN",
+    "PSYCH",
+    "SCI",
+    "STAT",
+    "WKEXP",
+    "ZOOL"
+  ],
   "course_count": 1277,
   "courses": [
     {
@@ -177,28 +209,28 @@
         "type": "AND",
         "children": [
           {
-            "type": "COURSE",
-            "code": "MATH 101",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 115",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 118",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 136",
-            "external": false
-          },
-          {
             "type": "OR",
             "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 101",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 115",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 118",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 136",
+                "external": false
+              },
               {
                 "type": "COURSE",
                 "code": "MATH 146",
@@ -255,28 +287,28 @@
         "type": "AND",
         "children": [
           {
-            "type": "COURSE",
-            "code": "MATH 101",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 115",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 118",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "MATH 136",
-            "external": false
-          },
-          {
             "type": "OR",
             "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 101",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 115",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 118",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 136",
+                "external": false
+              },
               {
                 "type": "COURSE",
                 "code": "MATH 146",
@@ -597,7 +629,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -1194,7 +1235,16 @@
           {
             "type": "LEVEL_MIN",
             "subject": "BIOL",
-            "min_level": 200
+            "min_level": 200,
+            "subjects": [
+              "BIOL",
+              "BOT",
+              "ENT",
+              "GENET",
+              "MICRB",
+              "ZOOL"
+            ],
+            "label": "Biological Sciences"
           }
         ]
       },
@@ -1536,7 +1586,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -1610,21 +1669,32 @@
       "prerequisites_text": "Prerequisite: BIOL 207 and BIOL 208. Pre-requisite: BIOL 380.",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "COURSE",
-        "code": "BIOL 207",
-        "external": false
+        "type": "AND",
+        "children": [
+          {
+            "type": "COURSE",
+            "code": "BIOL 207",
+            "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "BIOL 208",
+            "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "BIOL 380",
+            "external": false
+          }
+        ]
       },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
-      "notes": [
-        "could not interpret: BIOL 208. Pre-requisite: BIOL 380"
-      ],
-      "unrepresented_requirements": [
-        "BIOL 208. Pre-requisite: BIOL 380"
-      ],
-      "parse_status": "partial",
+      "notes": [],
+      "unrepresented_requirements": [],
+      "parse_status": "parsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/biol/392"
     },
@@ -1674,7 +1744,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -1707,7 +1786,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -1740,7 +1828,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -2017,7 +2114,16 @@
           {
             "type": "LEVEL_MIN",
             "subject": "BIOL",
-            "min_level": 300
+            "min_level": 300,
+            "subjects": [
+              "BIOL",
+              "BOT",
+              "ENT",
+              "GENET",
+              "MICRB",
+              "ZOOL"
+            ],
+            "label": "Biological Sciences"
           }
         ]
       },
@@ -2455,7 +2561,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 300
+        "min_level": 300,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -2569,7 +2684,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 300
+        "min_level": 300,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -2602,7 +2726,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 300
+        "min_level": 300,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -2633,7 +2766,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 300
+        "min_level": 300,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -2933,6 +3075,41 @@
             "type": "COURSE",
             "code": "BIOL 330",
             "external": false
+          },
+          {
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 113",
+                "external": true
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 114",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 115",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 120",
+                "external": true
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 125",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "SCI 100",
+                "external": true
+              }
+            ]
           }
         ]
       },
@@ -2942,13 +3119,9 @@
       "credit_exclusions": [
         "BIOL 431"
       ],
-      "notes": [
-        "could not interpret: any  MATH 113, MATH 114, MATH 115, MATH 120, MATH 125 or SCI 100"
-      ],
-      "unrepresented_requirements": [
-        "any  MATH 113, MATH 114, MATH 115, MATH 120, MATH 125 or SCI 100"
-      ],
-      "parse_status": "partial",
+      "notes": [],
+      "unrepresented_requirements": [],
+      "parse_status": "parsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/biol/531"
     },
@@ -3455,22 +3628,67 @@
       "description": "Physical principles important to the operation of biological systems. Biological applications of free energy, entropy, random walks, and diffusion; dynamics at low Reynolds number; cooperativity and 2-state systems; structural self-assembly; kinetic modeling; molecular motors and enzymes; membranes and potentials; genetic networks; sequences and evolution. PHYS 126/130/146 recommended.",
       "prerequisites_text": "Prerequisites: MATH 100/114/117/134/144, PHYS 124/144 or EN PH131.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": null,
+      "prerequisite_tree": {
+        "type": "AND",
+        "children": [
+          {
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 100",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 114",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 117",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 134",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 144",
+                "external": false
+              }
+            ]
+          },
+          {
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "PHYS 124",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "PHYS 144",
+                "external": false
+              }
+            ]
+          }
+        ]
+      },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: MATH 100/MATH 114/MATH 117/MATH 134/MATH 144",
-        "could not interpret: PHYS 124/PHYS 144",
         "could not interpret: EN PH131"
       ],
       "unrepresented_requirements": [
-        "MATH 100/MATH 114/MATH 117/MATH 134/MATH 144",
-        "PHYS 124/PHYS 144",
         "EN PH131"
       ],
-      "parse_status": "unparsed",
+      "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/bioph/201"
     },
@@ -3521,9 +3739,29 @@
             ]
           },
           {
-            "type": "COURSE",
-            "code": "MA PH 251",
-            "external": false
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 201",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 334",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 336",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "MA PH 251",
+                "external": false
+              }
+            ]
           },
           {
             "type": "COURSE",
@@ -3536,6 +3774,21 @@
             "external": false
           },
           {
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "PHYS 230",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "PHYS 281",
+                "external": false
+              }
+            ]
+          },
+          {
             "type": "COURSE",
             "code": "PHYS 310",
             "external": false
@@ -3546,15 +3799,9 @@
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
-      "notes": [
-        "could not interpret: MATH 201/MATH 334/MATH 336",
-        "could not interpret: PHYS 230/PHYS 281"
-      ],
-      "unrepresented_requirements": [
-        "MATH 201/MATH 334/MATH 336",
-        "PHYS 230/PHYS 281"
-      ],
-      "parse_status": "partial",
+      "notes": [],
+      "unrepresented_requirements": [],
+      "parse_status": "parsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/bioph/401"
     },
@@ -3686,7 +3933,16 @@
           {
             "type": "LEVEL_MIN",
             "subject": "BIOL",
-            "min_level": 200
+            "min_level": 200,
+            "subjects": [
+              "BIOL",
+              "BOT",
+              "ENT",
+              "GENET",
+              "MICRB",
+              "ZOOL"
+            ],
+            "label": "Biological Sciences"
           }
         ]
       },
@@ -3961,7 +4217,16 @@
           {
             "type": "LEVEL_MIN",
             "subject": "BIOL",
-            "min_level": 200
+            "min_level": 200,
+            "subjects": [
+              "BIOL",
+              "BOT",
+              "ENT",
+              "GENET",
+              "MICRB",
+              "ZOOL"
+            ],
+            "label": "Biological Sciences"
           },
           {
             "type": "COURSE",
@@ -4004,7 +4269,16 @@
           {
             "type": "LEVEL_MIN",
             "subject": "BIOL",
-            "min_level": 300
+            "min_level": 300,
+            "subjects": [
+              "BIOL",
+              "BOT",
+              "ENT",
+              "GENET",
+              "MICRB",
+              "ZOOL"
+            ],
+            "label": "Biological Sciences"
           }
         ]
       },
@@ -4702,22 +4976,28 @@
       "prerequisites_text": "Prerequisite CHEM 261 or 266. Prerequisite or co- requisite: CHEM265.",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "COURSE",
-        "code": "CHEM 261",
-        "external": false
+        "type": "OR",
+        "children": [
+          {
+            "type": "COURSE",
+            "code": "CHEM 261",
+            "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "CHEM 266",
+            "external": false
+          }
+        ]
       },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: CHEM 266. Prerequisite",
-        "could not interpret: co- requisite: CHEM265"
+        "may be taken as a corequisite, not required beforehand: Prerequisite or co- requisite: CHEM265"
       ],
-      "unrepresented_requirements": [
-        "CHEM 266. Prerequisite",
-        "co- requisite: CHEM265"
-      ],
+      "unrepresented_requirements": [],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/chem/267"
@@ -4803,15 +5083,16 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of Department",
         "could not interpret: GPA of 2.5",
         "could not interpret: higher",
-        "could not interpret: consent of Department. Specific projects may require additional prerequisites",
+        "could not interpret: Specific projects may require additional prerequisites",
         "consent of Department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
         "GPA of 2.5",
         "higher",
-        "consent of Department. Specific projects may require additional prerequisites"
+        "Specific projects may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -5300,24 +5581,26 @@
       "description": "Course may be repeated for credit, provided there is no duplication of specific topic.",
       "prerequisites_text": "Prerequisites: a 300- level CHEM course and consent of Instructor; prerequisite courses vary, depending on topic.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": null,
+      "prerequisite_tree": {
+        "type": "LEVEL_MIN",
+        "subject": "CHEM",
+        "min_level": 300
+      },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
         "consent of Instructor",
-        "could not interpret: a CMPUT 300- level CHEM course",
-        "could not interpret: prerequisite courses vary",
+        "could not interpret: courses vary",
         "could not interpret: depending on topic",
         "consent of Instructor (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "a CMPUT 300- level CHEM course",
-        "prerequisite courses vary",
+        "courses vary",
         "depending on topic"
       ],
-      "parse_status": "unparsed",
+      "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/chem/405"
     },
@@ -5450,9 +5733,19 @@
         "type": "OR",
         "children": [
           {
-            "type": "COURSE",
-            "code": "CHEM 243",
-            "external": true
+            "type": "AND",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "CHEM 243",
+                "external": true
+              },
+              {
+                "type": "LEVEL_MIN",
+                "subject": "CHEM",
+                "min_level": 300
+              }
+            ]
           },
           {
             "type": "COURSE",
@@ -5472,12 +5765,9 @@
       "credit_exclusions": [],
       "notes": [
         "consent of the instructor",
-        "could not interpret: one CHEM 300 level CHEM course",
         "consent of the instructor (informational -- not enforced in the graph)"
       ],
-      "unrepresented_requirements": [
-        "one CHEM 300 level CHEM course"
-      ],
+      "unrepresented_requirements": [],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/chem/436"
@@ -5748,20 +6038,21 @@
       "description": "Modern organic reactions and reactive intermediates. Cations, free radicals, radical ions, carbenes, metallocarbenes, arynes, and transition-metal catalysis. Mechanisms, transition-state conformational analysis and stereoelectronic effects. Diastereoselectivity. The laboratory is focused on multistep organic synthesis, featuring reactions drawn from the lecture topics. Students with credit for Chem 363 cannot take Chem 460 for credit.",
       "prerequisites_text": "Prerequisites: Chem 361 or consent of instructor.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": null,
+      "prerequisite_tree": {
+        "type": "COURSE",
+        "code": "CHEM 361",
+        "external": false
+      },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
         "consent of instructor",
-        "could not interpret: Chem CMPUT 361",
         "consent of instructor (informational -- not enforced in the graph)"
       ],
-      "unrepresented_requirements": [
-        "Chem CMPUT 361"
-      ],
-      "parse_status": "unparsed",
+      "unrepresented_requirements": [],
+      "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/chem/460"
     },
@@ -14692,9 +14983,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "not required, mentioned only as an aside: Faculty of Science"
+        "not required, mentioned only as an aside: Faculty of Science",
+        "ambiguous grouping, read as ALL of the listed courses (check the calendar -- it may mean any one of them): EAS 101, EAS 105, EAS 210 or SCI 100"
       ],
-      "unrepresented_requirements": [],
+      "unrepresented_requirements": [
+        "ambiguous grouping: EAS 101, EAS 105, EAS 210 or SCI 100"
+      ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/eas/224"
@@ -14802,9 +15096,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "not required, mentioned only as an aside: Faculty of Science"
+        "not required, mentioned only as an aside: Faculty of Science",
+        "ambiguous grouping, read as ALL of the listed courses (check the calendar -- it may mean any one of them): EAS 103, EAS 105 or SCI 100"
       ],
-      "unrepresented_requirements": [],
+      "unrepresented_requirements": [
+        "ambiguous grouping: EAS 103, EAS 105 or SCI 100"
+      ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/eas/230"
@@ -14882,9 +15179,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "not required, mentioned only as an aside: Faculty of Science"
+        "not required, mentioned only as an aside: Faculty of Science",
+        "ambiguous grouping, read as ALL of the listed courses (check the calendar -- it may mean any one of them): EAS 105, EAS 210 or SCI 100"
       ],
-      "unrepresented_requirements": [],
+      "unrepresented_requirements": [
+        "ambiguous grouping: EAS 105, EAS 210 or SCI 100"
+      ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/eas/233"
@@ -15037,9 +15337,13 @@
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
-      "notes": [],
-      "unrepresented_requirements": [],
-      "parse_status": "parsed",
+      "notes": [
+        "ambiguous grouping, read as ALL of the listed courses (check the calendar -- it may mean any one of them): EAS 100, BIOL 108 or SCI 100"
+      ],
+      "unrepresented_requirements": [
+        "ambiguous grouping: EAS 100, BIOL 108 or SCI 100"
+      ],
+      "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/eas/250"
     },
@@ -15300,9 +15604,19 @@
             ]
           },
           {
-            "type": "COURSE",
-            "code": "MATH 113",
-            "external": true
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "MATH 113",
+                "external": true
+              },
+              {
+                "type": "COURSE",
+                "code": "MATH 114",
+                "external": false
+              }
+            ]
           }
         ]
       },
@@ -15311,10 +15625,10 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: MATH 114. SCI 100 may be used in lieu of these prerequisites"
+        "could not interpret: SCI 100 may be used in lieu of these prerequisites"
       ],
       "unrepresented_requirements": [
-        "MATH 114. SCI 100 may be used in lieu of these prerequisites"
+        "SCI 100 may be used in lieu of these prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -16113,12 +16427,13 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "permission of the department",
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: permission of the department. Requires payment of additional student instructional support fees",
+        "could not interpret: Requires payment of additional student instructional support fees",
         "permission of the department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "permission of the department. Requires payment of additional student instructional support fees"
+        "Requires payment of additional student instructional support fees"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -16147,12 +16462,13 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "permission of the department",
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: permission of the department. Requires payment of additional student instructional support fees",
+        "could not interpret: Requires payment of additional student instructional support fees",
         "permission of the department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "permission of the department. Requires payment of additional student instructional support fees"
+        "Requires payment of additional student instructional support fees"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -16181,12 +16497,13 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "permission of the department",
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: permission of the department. Requires payment of additional student instructional support fees",
+        "could not interpret: Requires payment of additional student instructional support fees",
         "permission of the department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "permission of the department. Requires payment of additional student instructional support fees"
+        "Requires payment of additional student instructional support fees"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -16625,8 +16942,8 @@
       "corequisite_tree": null,
       "credit_exclusion_text": "(3) Astrobiology (this topic may not be taken for credit if credit has been obtained in the same BIO 495 or 595 topic).",
       "credit_exclusions": [
-        "CMPUT 495",
-        "CMPUT 595"
+        "EAS 495",
+        "EAS 595"
       ],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science"
@@ -17333,8 +17650,8 @@
       "corequisite_tree": null,
       "credit_exclusion_text": "(3) Astrobiology (this topic may not be taken for credit if credit has been obtained in the same BIO 495 or 595 topic).",
       "credit_exclusions": [
-        "CMPUT 495",
-        "CMPUT 595"
+        "EAS 495",
+        "EAS 595"
       ],
       "notes": [],
       "unrepresented_requirements": [],
@@ -17645,18 +17962,38 @@
       "description": "Evolution, distribution, and classification of terrestrial arthropods, with emphasis on hexapods. Students practice identification using museum collections, keys and databases, and make a substantive collection of regional insects. Credit can only be obtained for one of ENT 327, 427 or 527. Offered in alternate years.",
       "prerequisites_text": "Prerequisite: Any one of ENT 220, 222, or REN R 205, or ZOOL 250.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": null,
+      "prerequisite_tree": {
+        "type": "OR",
+        "children": [
+          {
+            "type": "COURSE",
+            "code": "ENT 220",
+            "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "ENT 222",
+            "external": true
+          },
+          {
+            "type": "COURSE",
+            "code": "REN R 205",
+            "external": true
+          },
+          {
+            "type": "COURSE",
+            "code": "ZOOL 250",
+            "external": false
+          }
+        ]
+      },
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
-      "notes": [
-        "could not interpret: Any  ENT 220, ENT 222, or REN R 205, or ZOOL 250"
-      ],
-      "unrepresented_requirements": [
-        "Any  ENT 220, ENT 222, or REN R 205, or ZOOL 250"
-      ],
-      "parse_status": "unparsed",
+      "notes": [],
+      "unrepresented_requirements": [],
+      "parse_status": "parsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/ent/327"
     },
@@ -20420,10 +20757,10 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: At least CMPUT 18 units at the CMPUT 100 level in the Faculty of Arts and/or the Faculty of Science"
+        "could not interpret: At least 18 units at the 100 level in the Faculty of Arts and/or the Faculty of Science"
       ],
       "unrepresented_requirements": [
-        "At least CMPUT 18 units at the CMPUT 100 level in the Faculty of Arts and/or the Faculty of Science"
+        "At least 18 units at the 100 level in the Faculty of Arts and/or the Faculty of Science"
       ],
       "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
@@ -20574,10 +20911,10 @@
         "WKEXP 801"
       ],
       "notes": [
-        "could not interpret: minimum of CMPUT 24 units of course weight towards their Arts degree prior to registering in this course"
+        "could not interpret: minimum of 24 units of course weight towards their Arts degree prior to registering in this course"
       ],
       "unrepresented_requirements": [
-        "minimum of CMPUT 24 units of course weight towards their Arts degree prior to registering in this course"
+        "minimum of 24 units of course weight towards their Arts degree prior to registering in this course"
       ],
       "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
@@ -20624,9 +20961,7 @@
       "corequisites_text": null,
       "corequisite_tree": null,
       "credit_exclusion_text": "Not open to students with credit in EXT 300.",
-      "credit_exclusions": [
-        "CMPUT 300"
-      ],
+      "credit_exclusions": [],
       "notes": [],
       "unrepresented_requirements": [],
       "parse_status": "parsed",
@@ -20651,7 +20986,7 @@
       "corequisite_tree": null,
       "credit_exclusion_text": "Not open to students with credit in EXT 300.",
       "credit_exclusions": [
-        "CMPUT 300"
+        "INT D 300"
       ],
       "notes": [],
       "unrepresented_requirements": [],
@@ -20677,7 +21012,7 @@
       "corequisite_tree": null,
       "credit_exclusion_text": "Not open to students with credit in EXT 300.",
       "credit_exclusions": [
-        "CMPUT 300"
+        "INT D 300"
       ],
       "notes": [],
       "unrepresented_requirements": [],
@@ -20706,11 +21041,11 @@
       "notes": [
         "consent of the department",
         "not required, mentioned only as an aside: Faculty of Arts",
-        "could not interpret: students must have a minimum of CMPUT 30 units",
+        "could not interpret: students must have a minimum of 30 units",
         "consent of the department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "students must have a minimum of CMPUT 30 units"
+        "students must have a minimum of 30 units"
       ],
       "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
@@ -21321,21 +21656,7 @@
       "description": "This course will provide opportunities for students to develop a deeper, more situated, understanding of the guiding principles that underpin equity, diversity, and inclusion (EDI) in the global context. In line with the United Nations Sustainable Development Goals (SDGs), the students will recognize the key issues related to EDI in global health including global citizenship, a sense of social justice; environmental, social, economic and political global challenges; agency; intersectionality (ethnicity, gender, patriarchy, power relationships) and an appreciation for cultural diversity.",
       "prerequisites_text": "Prerequisites: All courses in the BScN program except NURS 422, NURS 425 and NURS 485.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": {
-        "type": "AND",
-        "children": [
-          {
-            "type": "COURSE",
-            "code": "NURS 425",
-            "external": true
-          },
-          {
-            "type": "COURSE",
-            "code": "NURS 485",
-            "external": true
-          }
-        ]
-      },
+      "prerequisite_tree": null,
       "corequisites_text": "Corequisites NURS 422 and 425, SC INF 425 and PHILE 386.",
       "corequisite_tree": {
         "type": "AND",
@@ -21365,12 +21686,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: All courses in the BScN program except NURS 422"
+        "Requirement structure is too complex to parse reliably; read the calendar text."
       ],
       "unrepresented_requirements": [
-        "All courses in the BScN program except NURS 422"
+        "All courses in the BScN program except NURS 422, NURS 425 and NURS 485."
       ],
-      "parse_status": "partial",
+      "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/int_d/420"
     },
@@ -21387,21 +21708,7 @@
       "description": "This course will provide opportunities for students to develop a deeper, more situated, understanding of the guiding principles that underpin equity, diversity, and inclusion (EDI) in the global context. In line with the United Nations Sustainable Development Goals (SDGs), the students will recognize the key issues related to EDI in global health including global citizenship, a sense of social justice; environmental, social, economic and political global challenges; agency; intersectionality (ethnicity, gender, patriarchy, power relationships) and an appreciation for cultural diversity.",
       "prerequisites_text": "Prerequisites: All courses in the BScN program except NURS 422, NURS 425 and NURS 485.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": {
-        "type": "AND",
-        "children": [
-          {
-            "type": "COURSE",
-            "code": "NURS 425",
-            "external": true
-          },
-          {
-            "type": "COURSE",
-            "code": "NURS 485",
-            "external": true
-          }
-        ]
-      },
+      "prerequisite_tree": null,
       "corequisites_text": "Corequisites NURS 422 and 425, SC INF 425 and PHILE 386.",
       "corequisite_tree": {
         "type": "AND",
@@ -21431,12 +21738,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: All courses in the BScN program except NURS 422"
+        "Requirement structure is too complex to parse reliably; read the calendar text."
       ],
       "unrepresented_requirements": [
-        "All courses in the BScN program except NURS 422"
+        "All courses in the BScN program except NURS 422, NURS 425 and NURS 485."
       ],
-      "parse_status": "partial",
+      "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/int_d/420a"
     },
@@ -21453,21 +21760,7 @@
       "description": "This course will provide opportunities for students to develop a deeper, more situated, understanding of the guiding principles that underpin equity, diversity, and inclusion (EDI) in the global context. In line with the United Nations Sustainable Development Goals (SDGs), the students will recognize the key issues related to EDI in global health including global citizenship, a sense of social justice; environmental, social, economic and political global challenges; agency; intersectionality (ethnicity, gender, patriarchy, power relationships) and an appreciation for cultural diversity.",
       "prerequisites_text": "Prerequisites: All courses in the BScN program except NURS 422, NURS 425 and NURS 485.",
       "prerequisites_field_present": true,
-      "prerequisite_tree": {
-        "type": "AND",
-        "children": [
-          {
-            "type": "COURSE",
-            "code": "NURS 425",
-            "external": true
-          },
-          {
-            "type": "COURSE",
-            "code": "NURS 485",
-            "external": true
-          }
-        ]
-      },
+      "prerequisite_tree": null,
       "corequisites_text": "Corequisites NURS 422 and 425, SC INF 425 and PHILE 386.",
       "corequisite_tree": {
         "type": "AND",
@@ -21497,12 +21790,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: All courses in the BScN program except NURS 422"
+        "Requirement structure is too complex to parse reliably; read the calendar text."
       ],
       "unrepresented_requirements": [
-        "All courses in the BScN program except NURS 422"
+        "All courses in the BScN program except NURS 422, NURS 425 and NURS 485."
       ],
-      "parse_status": "partial",
+      "parse_status": "unparsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/int_d/420b"
     },
@@ -22760,10 +23053,10 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "could not interpret: 12 units in EAS and/or GEOPH at the 500-level"
       ],
       "unrepresented_requirements": [
-        "IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "12 units in EAS and/or GEOPH at the 500-level"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -22818,10 +23111,10 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "could not interpret: 12 units in EAS and/or GEOPH at the 500-level"
       ],
       "unrepresented_requirements": [
-        "IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "12 units in EAS and/or GEOPH at the 500-level"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -22876,10 +23169,10 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "could not interpret: 12 units in EAS and/or GEOPH at the 500-level"
       ],
       "unrepresented_requirements": [
-        "IPG 12 units in EAS and/or GEOPH at the 500-level"
+        "12 units in EAS and/or GEOPH at the 500-level"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -23765,10 +24058,10 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: minimum SCI 60 units"
+        "could not interpret: minimum 60 units"
       ],
       "unrepresented_requirements": [
-        "minimum SCI 60 units"
+        "minimum 60 units"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -24281,9 +24574,8 @@
       "corequisite_tree": null,
       "credit_exclusion_text": "Note: Credit can be obtained in at most one of Math 102, 125 or 127.",
       "credit_exclusions": [
-        "CMPUT 102",
-        "CMPUT 125",
-        "CMPUT 127"
+        "MATH 102",
+        "MATH 125"
       ],
       "notes": [],
       "unrepresented_requirements": [],
@@ -25380,7 +25672,7 @@
       "prerequisites_text": "Prerequisite: MATH 102, 125 or 127.",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "AND",
+        "type": "OR",
         "children": [
           {
             "type": "COURSE",
@@ -25388,19 +25680,14 @@
             "external": false
           },
           {
-            "type": "OR",
-            "children": [
-              {
-                "type": "COURSE",
-                "code": "MATH 125",
-                "external": false
-              },
-              {
-                "type": "COURSE",
-                "code": "MATH 127",
-                "external": false
-              }
-            ]
+            "type": "COURSE",
+            "code": "MATH 125",
+            "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "MATH 127",
+            "external": false
           }
         ]
       },
@@ -28919,12 +29206,12 @@
       "notes": [
         "consent of Instructor",
         "could not interpret: a MATH 400",
-        "could not interpret: MATH 500 level course on Partial Differential Equations",
+        "could not interpret: 500 level course on Partial Differential Equations",
         "consent of Instructor (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
         "a MATH 400",
-        "MATH 500 level course on Partial Differential Equations"
+        "500 level course on Partial Differential Equations"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -29588,9 +29875,24 @@
             "external": false
           },
           {
-            "type": "COURSE",
-            "code": "BIOCH 200",
-            "external": true
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "BIOCH 203",
+                "external": true
+              },
+              {
+                "type": "COURSE",
+                "code": "BIOCH 205",
+                "external": true
+              },
+              {
+                "type": "COURSE",
+                "code": "BIOCH 200",
+                "external": true
+              }
+            ]
           }
         ]
       },
@@ -29598,13 +29900,9 @@
       "corequisite_tree": null,
       "credit_exclusion_text": null,
       "credit_exclusions": [],
-      "notes": [
-        "could not interpret: BIOCH 203/BIOCH 205"
-      ],
-      "unrepresented_requirements": [
-        "BIOCH 203/BIOCH 205"
-      ],
-      "parse_status": "partial",
+      "notes": [],
+      "unrepresented_requirements": [],
+      "parse_status": "parsed",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/micrb/316"
     },
@@ -29685,9 +29983,19 @@
       "prerequisites_text": "Prerequisites: BIOL 322 or any 300 level MICRB course or consent of Department.",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "COURSE",
-        "code": "BIOL 322",
-        "external": false
+        "type": "OR",
+        "children": [
+          {
+            "type": "COURSE",
+            "code": "BIOL 322",
+            "external": false
+          },
+          {
+            "type": "LEVEL_MIN",
+            "subject": "MICRB",
+            "min_level": 300
+          }
+        ]
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -29695,12 +30003,9 @@
       "credit_exclusions": [],
       "notes": [
         "consent of Department",
-        "could not interpret: any BIOL 300 level MICRB course",
         "consent of Department (informational -- not enforced in the graph)"
       ],
-      "unrepresented_requirements": [
-        "any BIOL 300 level MICRB course"
-      ],
+      "unrepresented_requirements": [],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/micrb/423"
@@ -31994,11 +32299,11 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: any ZOOL 300 level EAS",
+        "could not interpret: any 300 level EAS",
         "could not interpret: Biological Sciences course"
       ],
       "unrepresented_requirements": [
-        "any ZOOL 300 level EAS",
+        "any 300 level EAS",
         "Biological Sciences course"
       ],
       "parse_status": "partial",
@@ -32028,11 +32333,11 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "could not interpret: any ZOOL 300 level EAS",
+        "could not interpret: any 300 level EAS",
         "could not interpret: Biological Sciences course"
       ],
       "unrepresented_requirements": [
-        "any ZOOL 300 level EAS",
+        "any 300 level EAS",
         "Biological Sciences course"
       ],
       "parse_status": "partial",
@@ -32482,6 +32787,11 @@
         "children": [
           {
             "type": "COURSE",
+            "code": "PHYS 124",
+            "external": false
+          },
+          {
+            "type": "COURSE",
             "code": "PHYS 144",
             "external": false
           },
@@ -32515,12 +32825,9 @@
       ],
       "notes": [
         "not required, mentioned only as an aside: see Note following",
-        "could not interpret: Prerequisite: PHYS 124",
         "minimum grade of B (informational -- not enforced in the graph)"
       ],
-      "unrepresented_requirements": [
-        "Prerequisite: PHYS 124"
-      ],
+      "unrepresented_requirements": [],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/phys/181"
@@ -36552,17 +36859,18 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of the Department",
         "could not interpret: GPA of 2.5",
         "could not interpret: higher",
         "could not interpret: one other PSYCH course",
-        "could not interpret: consent of the Department. Specific labs may require additional prerequisites",
+        "could not interpret: Specific labs may require additional prerequisites",
         "consent of the Department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
         "GPA of 2.5",
         "higher",
         "one other PSYCH course",
-        "consent of the Department. Specific labs may require additional prerequisites"
+        "Specific labs may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -36620,6 +36928,11 @@
             "type": "COURSE",
             "code": "PSYCH 105",
             "external": false
+          },
+          {
+            "type": "LEVEL_MIN",
+            "subject": "PSYCH",
+            "min_level": 200
           }
         ]
       },
@@ -36629,11 +36942,11 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: one 200-level PSYCH course. Consult the Department of Psychology website for the topics offered",
+        "could not interpret: Consult the Department of Psychology website for the topics offered",
         "could not interpret: any additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "one 200-level PSYCH course. Consult the Department of Psychology website for the topics offered",
+        "Consult the Department of Psychology website for the topics offered",
         "any additional prerequisites"
       ],
       "parse_status": "partial",
@@ -36816,22 +37129,32 @@
       "prerequisites_text": "Prerequisites: PSYCH 212 and, PSYCH 213 or STAT 151 or STAT 161. [Faculty of Arts]",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "OR",
+        "type": "AND",
         "children": [
           {
             "type": "COURSE",
-            "code": "PSYCH 213",
+            "code": "PSYCH 212",
             "external": false
           },
           {
-            "type": "COURSE",
-            "code": "STAT 151",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "STAT 161",
-            "external": false
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "PSYCH 213",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "STAT 151",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "STAT 161",
+                "external": false
+              }
+            ]
           }
         ]
       },
@@ -36840,12 +37163,9 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
-        "not required, mentioned only as an aside: Faculty of Arts",
-        "could not interpret: PSYCH 212 and"
+        "not required, mentioned only as an aside: Faculty of Arts"
       ],
-      "unrepresented_requirements": [
-        "PSYCH 212 and"
-      ],
+      "unrepresented_requirements": [],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
       "source_url": "https://apps.ualberta.ca/catalogue/course/psych/315"
@@ -37987,12 +38307,13 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of the Department",
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: consent of the Department. Specific projects may require additional prerequisites",
+        "could not interpret: Specific projects may require additional prerequisites",
         "consent of the Department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "consent of the Department. Specific projects may require additional prerequisites"
+        "Specific projects may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -38021,11 +38342,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of an academic member in the Department of Psychology",
         "not required, mentioned only as an aside: Faculty of Arts",
-        "could not interpret: consent of an academic member in the Department of Psychology. Specific projects may require additional prerequisites"
+        "could not interpret: Specific projects may require additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "consent of an academic member in the Department of Psychology. Specific projects may require additional prerequisites"
+        "Specific projects may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -38102,22 +38424,32 @@
       "prerequisites_text": "Prerequisites: PSYCH 213 or STAT 151 or 161, and one 300-level PSYCH course. Consult the Department of Psychology website for the topics offered and any additional prerequisites.[Faculty of Science]",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "OR",
+        "type": "AND",
         "children": [
           {
-            "type": "COURSE",
-            "code": "PSYCH 213",
-            "external": false
+            "type": "OR",
+            "children": [
+              {
+                "type": "COURSE",
+                "code": "PSYCH 213",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "STAT 151",
+                "external": false
+              },
+              {
+                "type": "COURSE",
+                "code": "STAT 161",
+                "external": false
+              }
+            ]
           },
           {
-            "type": "COURSE",
-            "code": "STAT 151",
-            "external": false
-          },
-          {
-            "type": "COURSE",
-            "code": "STAT 161",
-            "external": false
+            "type": "LEVEL_MIN",
+            "subject": "PSYCH",
+            "min_level": 300
           }
         ]
       },
@@ -38127,11 +38459,11 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: one 300-level PSYCH course. Consult the Department of Psychology website for the topics offered",
+        "could not interpret: Consult the Department of Psychology website for the topics offered",
         "could not interpret: any additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "one 300-level PSYCH course. Consult the Department of Psychology website for the topics offered",
+        "Consult the Department of Psychology website for the topics offered",
         "any additional prerequisites"
       ],
       "parse_status": "partial",
@@ -39578,7 +39910,7 @@
       "prerequisites_text": "Prerequisites: PSYCH 350, 354, 356 or 357. Consult the Department of Psychology website for the topics offered and any additional prerequisites.[Faculty of Science]",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "AND",
+        "type": "OR",
         "children": [
           {
             "type": "COURSE",
@@ -39594,6 +39926,11 @@
             "type": "COURSE",
             "code": "PSYCH 356",
             "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "PSYCH 357",
+            "external": false
           }
         ]
       },
@@ -39603,11 +39940,11 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: PSYCH 357. Consult the Department of Psychology website for the topics offered",
+        "could not interpret: Consult the Department of Psychology website for the topics offered",
         "could not interpret: any additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "PSYCH 357. Consult the Department of Psychology website for the topics offered",
+        "Consult the Department of Psychology website for the topics offered",
         "any additional prerequisites"
       ],
       "parse_status": "partial",
@@ -39775,7 +40112,7 @@
       "prerequisites_text": "Prerequisites: PSYCH 371, 375 or 377. Consult the Department of Psychology website for the topics offered and any additional prerequisites.[Faculty of Science]",
       "prerequisites_field_present": true,
       "prerequisite_tree": {
-        "type": "AND",
+        "type": "OR",
         "children": [
           {
             "type": "COURSE",
@@ -39786,6 +40123,11 @@
             "type": "COURSE",
             "code": "PSYCH 375",
             "external": false
+          },
+          {
+            "type": "COURSE",
+            "code": "PSYCH 377",
+            "external": false
           }
         ]
       },
@@ -39795,11 +40137,11 @@
       "credit_exclusions": [],
       "notes": [
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: PSYCH 377. Consult the Department of Psychology website for the topics offered",
+        "could not interpret: Consult the Department of Psychology website for the topics offered",
         "could not interpret: any additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "PSYCH 377. Consult the Department of Psychology website for the topics offered",
+        "Consult the Department of Psychology website for the topics offered",
         "any additional prerequisites"
       ],
       "parse_status": "partial",
@@ -40166,12 +40508,13 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of the Department",
         "not required, mentioned only as an aside: Faculty of Science",
-        "could not interpret: consent of the Department. Specific projects may require additional prerequisites",
+        "could not interpret: Specific projects may require additional prerequisites",
         "consent of the Department (informational -- not enforced in the graph)"
       ],
       "unrepresented_requirements": [
-        "consent of the Department. Specific projects may require additional prerequisites"
+        "Specific projects may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -40200,11 +40543,12 @@
       "credit_exclusion_text": null,
       "credit_exclusions": [],
       "notes": [
+        "consent of an academic member in the Department of Psychology",
         "not required, mentioned only as an aside: Faculty of Arts",
-        "could not interpret: consent of an academic member in the Department of Psychology. Specific projects may require additional prerequisites"
+        "could not interpret: Specific projects may require additional prerequisites"
       ],
       "unrepresented_requirements": [
-        "consent of an academic member in the Department of Psychology. Specific projects may require additional prerequisites"
+        "Specific projects may require additional prerequisites"
       ],
       "parse_status": "partial",
       "coreq_parse_status": "parsed",
@@ -45050,7 +45394,16 @@
       "prerequisite_tree": {
         "type": "LEVEL_MIN",
         "subject": "BIOL",
-        "min_level": 200
+        "min_level": 200,
+        "subjects": [
+          "BIOL",
+          "BOT",
+          "ENT",
+          "GENET",
+          "MICRB",
+          "ZOOL"
+        ],
+        "label": "Biological Sciences"
       },
       "corequisites_text": null,
       "corequisite_tree": null,
@@ -45208,7 +45561,16 @@
               {
                 "type": "LEVEL_MIN",
                 "subject": "BIOL",
-                "min_level": 300
+                "min_level": 300,
+                "subjects": [
+                  "BIOL",
+                  "BOT",
+                  "ENT",
+                  "GENET",
+                  "MICRB",
+                  "ZOOL"
+                ],
+                "label": "Biological Sciences"
               }
             ]
           }
@@ -45256,7 +45618,16 @@
               {
                 "type": "LEVEL_MIN",
                 "subject": "BIOL",
-                "min_level": 300
+                "min_level": 300,
+                "subjects": [
+                  "BIOL",
+                  "BOT",
+                  "ENT",
+                  "GENET",
+                  "MICRB",
+                  "ZOOL"
+                ],
+                "label": "Biological Sciences"
               }
             ]
           }
@@ -45304,7 +45675,16 @@
               {
                 "type": "LEVEL_MIN",
                 "subject": "BIOL",
-                "min_level": 300
+                "min_level": 300,
+                "subjects": [
+                  "BIOL",
+                  "BOT",
+                  "ENT",
+                  "GENET",
+                  "MICRB",
+                  "ZOOL"
+                ],
+                "label": "Biological Sciences"
               }
             ]
           }
@@ -45352,7 +45732,16 @@
               {
                 "type": "LEVEL_MIN",
                 "subject": "BIOL",
-                "min_level": 300
+                "min_level": 300,
+                "subjects": [
+                  "BIOL",
+                  "BOT",
+                  "ENT",
+                  "GENET",
+                  "MICRB",
+                  "ZOOL"
+                ],
+                "label": "Biological Sciences"
               }
             ]
           }
