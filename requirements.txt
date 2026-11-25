@@ -1,2 +1,5 @@
-requests>=2.31
-beautifulsoup4>=4.12
+# Runtime dependencies of the scraper (the parser itself is pure stdlib).
+# Pinned so a re-scrape next term runs the same code that was tested; bump
+# deliberately and re-run the test suites when you do.
+requests==2.34.2
+beautifulsoup4==4.15.0

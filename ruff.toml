@@ -1,0 +1,13 @@
+# Python lint config (`ruff check .`). Run in CI.
+target-version = "py310"
+line-length = 110
+extend-exclude = ["frontend", "data"]
+
+[lint]
+# pyflakes, pycodestyle errors/warnings, import sorting kept off (scripts
+# insert their own directory on sys.path before importing siblings), bugbear.
+select = ["F", "E", "W", "B"]
+ignore = [
+  "E402",  # sibling imports follow a sys.path insert by design
+  "E501",  # long regexes and messages read better unwrapped
+]
