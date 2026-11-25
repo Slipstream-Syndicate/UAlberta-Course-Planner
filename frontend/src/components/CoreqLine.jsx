@@ -1,5 +1,6 @@
 import React from 'react';
 import PrereqTree, { Chip } from './PrereqTree.jsx';
+import { levelLabel } from '../lib/evalEngine.js';
 
 /**
  * Corequisites, rendered on one horizontal line.
@@ -35,7 +36,7 @@ function Leaf({ node, onSelect }) {
     return (
       <Chip tone={node.satisfied ? 'done' : 'todo'}>
         {node.satisfied ? '✓ ' : ''}
-        any {node.min_level}-level {node.subject} course
+        any {node.min_level}-level {levelLabel(node)} course
       </Chip>
     );
   }

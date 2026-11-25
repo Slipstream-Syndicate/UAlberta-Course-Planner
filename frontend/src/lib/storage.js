@@ -8,6 +8,8 @@
  * because storage is unavailable is worse than one that simply forgets.
  */
 
+// The key predates the multi-subject rename. It is deliberately NOT renamed:
+// changing it would silently wipe every returning visitor's saved list.
 const KEY = 'cmput-prereq-explorer:completed';
 
 export function loadCompleted() {

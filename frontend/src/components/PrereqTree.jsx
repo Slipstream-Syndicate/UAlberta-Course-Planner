@@ -1,4 +1,4 @@
-import React from 'react';
+import { levelLabel } from '../lib/evalEngine.js';
 
 /**
  * The on-screen prerequisite tree.
@@ -84,6 +84,11 @@ function Node({ node, onSelect, depth = 0, unparsed = false }) {
               not tracked in this dataset — verify eligibility yourself
             </span>
           )}
+          {node.cycle && (
+            <span className="text-xs text-slate-500">
+              ↺ loops back to a course already on this path — not a usable route here
+            </span>
+          )}
           {node.parseStatus && node.parseStatus !== 'parsed' && (
             <span className="text-xs text-amber-800">
               ({node.parseStatus} parse — check its raw text)
@@ -108,7 +113,7 @@ function Node({ node, onSelect, depth = 0, unparsed = false }) {
     return (
       <Chip tone={node.satisfied ? 'done' : 'todo'}>
         {node.satisfied ? '✓ ' : ''}
-        any {node.min_level}-level {node.subject} course
+        any {node.min_level}-level {levelLabel(node)} course
         {node.satisfiedBy ? ' (' + node.satisfiedBy + ')' : ''}
       </Chip>
     );
