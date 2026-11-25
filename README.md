@@ -8,18 +8,29 @@ options to get into course X" entirely in the browser.
 **Not official academic advising.** See the disclaimer in the app and in
 [DESIGN.md](DESIGN.md).
 
+## Requirements
+
+- **Python 3.10+** (3.11 is what CI runs). The parser itself is pure stdlib;
+  the scraper needs the pinned packages in `requirements.txt`.
+- **Node.js 20.19+ or 22.12+** (CI runs 22) for the frontend.
+
 ## Quick start
+
+If you only want to run the app, the generated data is already committed, so
+skip straight to the frontend block.
 
 ```bash
 # Python side (scraper + parser)
 python -m venv venv
-./venv/Scripts/python.exe -m pip install -r requirements.txt   # Windows
-# source venv/bin/activate && pip install -r requirements.txt  # macOS/Linux
+./venv/Scripts/python.exe -m pip install -r requirements-dev.txt   # Windows
+# source venv/bin/activate && pip install -r requirements-dev.txt  # macOS/Linux
+# (requirements.txt alone is enough to scrape; -dev adds ruff + pip-audit)
 
 python parser/subjects.py --refresh    # -> data/subjects.json (the closed vocabulary)
 python scraper/scraper.py              # all 31 Science subjects (~1,300 requests, 1s apart, ~25 min)
-python scraper/scraper.py --subjects cmput math stat   # or pick subjects explicitly
+python scraper/scraper.py --subjects cmput math   # re-scrape some subjects; the rest are KEPT (merged)
 python parser/test_parser.py           # golden test set -- run before trusting a fresh scrape
+python scraper/test_scraper.py         # scraper tests, offline (no network, no cache needed)
 python parser/build_courses.py         # -> data/courses.json + parse-status report
 python parser/spotcheck.py             # eyeball 15 core CMPUT courses against raw text
 python parser/spotcheck.py --math      # the 15 MATH courses covering its new grammar
@@ -29,43 +40,66 @@ python parser/outliers.py              # what the parser had NO rule for, ranked
 
 # Frontend
 cd frontend
-npm install
-npm test                               # eval engine + print title + full-app render
-npm run dev
+npm ci                                 # exact versions from package-lock.json
+npm test                               # engine + links + print title + full-app render + dataset verify
+npm run lint                           # ESLint (incl. React hooks rules)
+npm run dev                            # http://localhost:5173 -- a course is linkable as #/course/CMPUT%20301
 ```
 
 `data/courses_raw.json` and `data/courses.json` are **generated**. Never
 hand-edit them; re-run the whole pipeline instead. They *are* committed to the
-repo, though — see [Deploying](#deploying) for why.
+repo, though — see [Deploying](#deploying) for why. CI regenerates
+`courses.json` from `courses_raw.json` on every push and fails if the
+committed file differs, so a parser change cannot ship without its data.
 
-If you just want to run the app and not touch the data, both JSON files are
-already in the repo, so you can skip straight to the frontend steps.
+## Development and CI
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+| Job | Checks |
+|---|---|
+| Python | `ruff check .`, parser golden tests, scraper tests, committed `courses.json` matches the parser, `verify_all.py`, `audit_coverage.py`, `pip-audit` |
+| Frontend | `npm ci`, `npm run lint`, `npm test`, `npm run build`, `npm audit` |
+
+Before opening a pull request, run the same locally: `ruff check .` and the
+Python scripts from the repo root, then `npm run lint && npm test && npm run
+build` in `frontend/`. Any parser change should come with a golden fixture in
+`parser/test_parser.py` taken from real catalogue text, and a regenerated
+`data/courses.json` (`python parser/build_courses.py`) — review its diff
+course by course, since that diff *is* the behaviour change students will see.
 
 ## Layout
 
 ```
 scraper/scraper.py        catalogue -> data/courses_raw.json (raw fields, no logic)
+scraper/test_scraper.py   offline tests: sentence classifier, page parsing, merge, retry/backoff
 parser/parser.py          prerequisite text -> boolean tree
 parser/build_courses.py   ETL: raw -> data/courses.json, + parse-status report
-parser/test_parser.py     golden test set (92 assertions, CMPUT + MATH)
+parser/test_parser.py     golden test set (121 assertions, real catalogue text across subjects)
 parser/spotcheck.py       human-readable tree vs. raw text, for manual validation
 parser/audit_coverage.py  automated check: does each tree cover every course its text names?
 parser/subjects.py        the closed vocabulary: 305 UAlberta subject codes + names
 parser/outliers.py        ranked report of what no rule matched -- finds unknown unknowns
 parser/verify_all.py      whole-dataset integrity: schema, flags, cycles, honesty
 frontend/src/lib/verifyDataset.js  whole-dataset engine check (round-trips every course)
-frontend/src/lib/evalEngine.js   the "what are my options" boolean walk
+frontend/src/lib/evalEngine.js   the "what are my options" boolean walk (+ course-list input parsing)
+frontend/src/lib/links.js        safe outbound links + the #/course/<code> route
 frontend/src/App.jsx      search, tree, options, print view
-data/html_cache/          cached page HTML so parser iteration never re-hits the site
+.github/workflows/ci.yml  lint, tests, data-freshness check, dependency audits
+data/html_cache/          cached page HTML so parser iteration never re-hits the site (git-ignored)
 ```
 
 ## Current accuracy (1,277 courses, 31 subjects, scraped 2026-09-05)
 
 | Group | parsed | partial | unparsed |
 |---|---|---|---|
-| All courses (1,277) | 64.3% | 21.3% | 14.4% |
-| Undergrad (755) | 58.0% | 31.1% | 10.9% |
-| Graduate (522) | 73.4% | 7.1% | 19.5% |
+| All courses (1,277) | 64.6% | 21.1% | 14.3% |
+| Undergrad (755) | 58.4% | 30.9% | 10.7% |
+| Graduate (522) | 73.6% | 6.9% | 19.5% |
+
+`parsed` rose only slightly in the QC pass, but that understates the change:
+44 courses got a different tree or status, almost all of them *more correct*
+rather than *more often parsed*. See [QC pass](#qc-pass-2026-11) below.
 
 `build_courses.py` prints a **per-subject table sorted worst-first**, because
 accuracy does not transfer between departments and an aggregate hides a badly
@@ -113,6 +147,36 @@ real scope bracket that outer splits must not reach inside of, and a bare comma
 is itself a requirement separator (`"CMPUT 204 or 275, 301"` needs 301 *as well
 as* one of 204/275 — reading it as another OR alternative would tell a student
 301 alone is enough). All of this is in the golden test set.
+
+The one exception is the English OR list with no serial comma:
+`"MATH 102, 125 or 127"` is *any one of three*. The rule: when every item
+before the last is a single course and the last item is exactly `X or Y`,
+an all-one-subject list is an OR; a mixed-subject one (`"PSYCH 212, PSYCH 213
+or STAT 151"`, usually `212 AND (213 OR STAT 151)`) keeps the conservative
+AND reading but is flagged *ambiguous*, so the course is `partial` and the UI
+won't call anyone eligible on it.
+
+## QC pass (2026-11)
+
+A full QC review found the parser was confidently wrong in places no existing
+check could see, because the coverage audit compares the *set* of course codes
+in a tree with the text, not the AND/OR structure. What changed, with the
+courses that showed it:
+
+| Bug | Example | Effect before the fix |
+|---|---|---|
+| `"A, B or C"` read as `A AND (B OR C)`, marked `parsed` | MATH 228, ASTRO 320, PSYCH 458/473 | Students told they needed courses they did not |
+| Parser never told the course's own subject; bare numbers defaulted to CMPUT | MATH 127, EAS 467/567 credit exclusions | MATH 127 listed `CMPUT 102/125` as exclusions, so a student with MATH 125 was never warned |
+| `"except"` not treated as negation | INT D 420/420A/420B | Tree *required* the exact courses the text excludes |
+| `"X with a minimum grade of C-"` dropped X silently | (latent; probe) | Tree could claim eligibility without X |
+| `_codes_in` checked context on the wrong string offsets | `"CMPUT 301, 302 (Fall)"` | 302 silently lost from exclusions and audits |
+| `"any one of"`, `"300 level"`, `"Chem 361"`, `"MATH 100/114"`, a second `Prerequisite:` label, `"30 units"` | BIOL 531, ENT 327, MICRB 423, CHEM 460, BIOPH 201, BIOL 392, PHYS 181, INT D 301 | Requirements dropped or courses invented (`CMPUT 30`) |
+| `"Biological Sciences"` resolved to BIOL only | BIOL 335, BOT 306, ZOOL 405 … | ZOOL/BOT/GENET courses did not count |
+| A real two-course loop shown as a red "data is likely wrong" error | MATH 337, MA PH 351 (+26 reaching them) | Correct data presented as broken |
+| Scraper: abbreviation guard never fired; partial scrape overwrote all subjects; failed fetches skipped silently | — | Truncated sentences; data loss |
+
+Every row has a golden fixture in `parser/test_parser.py` (the `test_qc_*`
+tests) or `scraper/test_scraper.py`.
 
 ## What MATH added that CMPUT never showed (Phase 5, subject 1 of 31)
 
@@ -196,13 +260,16 @@ PLAN went 25% → 81% parsed and EAS 23% → 3% unparsed off the back of those.
 What is left is a genuine long tail: no remaining outlier group affects more
 than 5 courses.
 
-**Two real cycles exist**, and they are faithful to the catalogue: MA PH 351
+**One real loop exists**, and it is faithful to the catalogue: MA PH 351
 lists MATH 337 as one of its alternatives and MATH 337 lists MA PH 351 as one
-of its own. Neither is a deadlock — each is reachable by its other branch — so
-26 PHYS/GEOPH/MATH courses reach that pair transitively and the engine's cycle
-guard handles them. `verify_all.py` treats a **self**-reference as an error
-(always a parse bug — it caught EAS 200 reading an equivalence statement as a
-requirement) and a mutual cycle as a warning.
+of its own. Neither is a deadlock — each is reachable by its other branch — and
+26 PHYS/GEOPH/MATH courses reach that pair transitively. The engine treats the
+looping branch as a **dead end on that path** (you cannot use MA PH 351 to
+unlock the MATH 337 you need in order to get MA PH 351), takes the other
+branches, and explains the loop in a neutral note — it is never shown as an
+error. `verify_all.py` treats a **self**-reference as an error (always a parse
+bug — it caught EAS 200 reading an equivalence statement as a requirement) and
+a mutual loop as a warning.
 
 ## Design decisions worth knowing
 
@@ -223,11 +290,23 @@ requirement) and a mutual cycle as a warning.
 - **Corequisites are never folded into the eligibility check.** "Take
   alongside" is a different claim from "must already be done".
 - **Recursion is guarded** by a visited set and a depth cap. The test suite
-  asserts no course in the shipped dataset trips either.
+  asserts no course in the shipped dataset raises an engine error.
 - **`LEVEL_MIN` uses `min_level` semantics** (≥ the stated level), per the
   schema in DESIGN.md. Note that "any 300-level course" in the calendar
   arguably means *exactly* 300-level; the UI shows the constraint verbatim so a
-  reader can judge.
+  reader can judge. A department name spanning several subjects ("a 200-level
+  Biological Sciences course") carries the full list in `subjects`
+  (BIOL, BOT, ENT, GENET, MICRB, ZOOL) and any of them satisfies it.
+- **Known limitation:** one completed course can satisfy both a named
+  requirement and a level requirement in the same AND (e.g. "CMPUT 301 and any
+  300-level CMPUT course"). The catalogue is ambiguous about whether that
+  double-counts, so the engine does not try to decide.
+- **The viewed course is in the URL** (`#/course/CMPUT%20301`), so links and
+  refreshes land on the same course and back/forward step through courses.
+  Hash rather than path routing, so it works from any static subpath.
+- **Every outbound link is https-only** (`safeHref` in `links.js`), and the
+  Netlify config sends a strict Content-Security-Policy (`'self'` only — the
+  build has no inline script or style).
 - **Print export uses no PDF library.** A `@media print` stylesheet hides the
   chrome and renders an indented outline (graphs don't survive pagination), and
   `document.title` is swapped on `beforeprint` so the browser suggests
@@ -243,24 +322,40 @@ User-Agent naming it as a student project (no browser spoofing), and on-disk
 HTML caching so parser iteration never re-hits the site. Use `--limit` while
 developing and `--refresh` only when you actually want fresh HTML.
 
+Transient failures (429/5xx, connection errors) are retried up to 3 times with
+a backoff of 10s and up (honouring `Retry-After`); a 404 is not retried. If any
+course page still fails, the scraper **refuses to write** rather than ship a
+dataset silently missing courses (`--allow-partial` overrides). Output is
+**merged** by subject — re-scraping `--subjects math` replaces MATH and keeps
+the other 30 subjects; `--replace` writes only what was scraped.
+
 ## Phase status
 
-- **Phase 1 — Data pipeline.** Done. Golden tests pass (57 assertions),
-  15-course manual spot-check verified, parse-status breakdown reported above.
-- **Phase 2 — Eval engine.** Done. 40 assertions, run against both fixtures and
-  the real dataset.
-- **Phase 3 — Frontend.** Done. Search, tree, and "what are my options",
-  with an 18-assertion render test that mounts the real app.
-- **Phase 4 — Export & polish.** Done. Print view, dynamic filename with its
-  regression guard, XSS hygiene (no `dangerouslySetInnerHTML` anywhere),
-  `npm audit` and `pip-audit` clean.
-- **Phase 5 — Expand scope.** MATH added (1 of 31 Faculty of Science subjects).
-  92 parser assertions and 27 render assertions pass; CMPUT's numbers are
-  unchanged, so the generalization caused no regression. 15 MATH courses were
-  spot-checked by hand against the calendar. Remaining subjects are mechanical
-  by comparison — the reverse-direction, combined-field and spelled-out-subject
-  handling that MATH forced is already in place, and BIOL/PHYS are where the
-  reverse-direction sentences actually live.
+All five phases are done; all 31 Faculty of Science subjects are scraped and
+parsed. Current test counts (all run in CI):
+
+| Suite | Assertions |
+|---|---|
+| `parser/test_parser.py` (golden fixtures) | 121 |
+| `scraper/test_scraper.py` (offline) | 21 |
+| `frontend/src/lib/evalEngine.test.js` | 74 |
+| `frontend/src/lib/links.test.js` | 16 |
+| `frontend/src/lib/usePrintTitle.test.js` | 13 |
+| `frontend/src/App.render.test.js` (mounts the real app on the real data) | 69 |
+| `verifyDataset.js`, `verify_all.py`, `audit_coverage.py` | every course |
+
+- **Phase 1 — Data pipeline.** Golden tests, a 15-course CMPUT and 15-course
+  MATH manual spot-check, parse-status breakdown reported above.
+- **Phase 2 — Eval engine.** Run against both fixtures and the real dataset.
+- **Phase 3 — Frontend.** Search, tree, and "what are my options".
+- **Phase 4 — Export & polish.** Print view, dynamic filename with its
+  regression guard, XSS hygiene (no `dangerouslySetInnerHTML`, https-only
+  links, strict CSP), `npm audit` and `pip-audit` clean as of the QC pass
+  (both had findings before it: build-time Vite/undici/source-map-js, and
+  `requests` 2.31.0).
+- **Phase 5 — Expand scope.** All 31 Faculty of Science subjects. Validation
+  is weaker outside CMPUT and MATH — nobody here can falsify a CHEM or BIOL tree
+  from memory — which is why the structural checks above matter.
 
 ### Verifying the whole dataset
 
@@ -287,8 +382,9 @@ every course at once, without anyone hand-writing an expected tree. It also
 asserts the plan is listed in *walkable order* (deepest prerequisite first) and
 that no unreadable course claims eligibility.
 
-Current: 0 errors, 174 of 176 courses round-trip, the other 2 correctly
-flagged as having incomplete trees.
+Current: 0 errors. Of the 673 courses with a tree, 599 round-trip and the
+other 74 are correctly flagged as having incomplete trees (the plan satisfies
+the tree, and the engine still declines to say "eligible").
 
 ### Auditing a subject
 
@@ -303,18 +399,24 @@ python parser/audit_coverage.py
 A code in the text but not the tree means a dropped requirement
 (**under-constrained** -- the dangerous direction, since it tells a student
 less is needed than really is). A code in the tree but not the text means one
-was invented. Currently: **0 invented**, and 3 known drops, all deliberate
-(MATH 421/422 refuse to guess; MATH 570 needs "a 400 or 500 level course on
-Partial Differential Equations", which the schema cannot express and the notes
-record instead).
+was invented. Currently: **0 invented**, and 26 courses where the text names
+a code the tree does not. Every one is either recorded in
+`unrepresented_requirements` (so the UI shows "part of this course's
+requirements are not shown" and never says "eligible" on it — e.g. MATH
+421/422, which refuse to guess, or MATH 570's "a 400 or 500 level course on
+Partial Differential Equations") or a harmless aside such as BOT 314's
+"(BOT 205 recommended)". `verify_all.py` errors if a `parsed` course drops
+anything.
 
 This audit is what caught MATH 467 and MATH 556 after the golden tests were
-already green.
+already green. Note what it **cannot** see: it compares code *sets*, so a tree
+with the right courses and the wrong AND/OR (the MATH 228 bug) passes it. The
+golden fixtures are the guard for structure.
 
 ### Adding the next subject
 
 ```bash
-python scraper/scraper.py --subjects cmput math stat
+python scraper/scraper.py --subjects <slug>   # merged into the existing data
 python parser/test_parser.py          # must stay green -- catches regressions
 python parser/build_courses.py        # read the PER-SUBJECT breakdown
 python parser/spotcheck.py 265 --all  # eyeball the new subject's shapes
@@ -351,6 +453,10 @@ connecting the repo:
 For Vercel, enter the same three values in the project settings. For GitHub
 Pages, run `npm run build` and publish `frontend/dist` — `vite.config.js` sets
 `base: './'`, so the bundle works from a repository subpath without changes.
+
+The security headers (CSP, `X-Frame-Options`, etc.) live in `netlify.toml`
+only. On Vercel, copy them into a `vercel.json` `headers` block; GitHub Pages
+cannot set response headers at all.
 
 **The build does not run the scraper, and must not.** `data/courses.json` is
 committed precisely so deploys never touch `apps.ualberta.ca`; scraping on
