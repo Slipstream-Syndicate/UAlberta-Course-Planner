@@ -7,7 +7,7 @@
 # scraper during every deploy -- would hit apps.ualberta.ca on every push,
 # which the scraper-etiquette rule in DESIGN.md rules out.
 #
-# Committing courses_raw.json too (220K) means the parser can be re-run and
+# Committing courses_raw.json too (~1.9MB) means the parser can be re-run and
 # iterated on without re-scraping the university's site at all.
 #
 # Still regenerate BOTH from scratch on every re-scrape; never hand-edit them.

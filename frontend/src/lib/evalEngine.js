@@ -1,5 +1,5 @@
 /**
- * CMPUT Prerequisite Explorer -- boolean eval engine (Phase 2)
+ * UAlberta Prerequisite Explorer -- boolean eval engine (Phase 2)
  *
  * "What are my options": given a target course and the courses a student has
  * already completed, walk the prerequisite tree and report which branches are
@@ -21,9 +21,14 @@
  *   3. External (unscraped) courses are leaves. We never recurse into their
  *      prerequisites, because we never scraped them -- inventing a chain there
  *      would be a confident lie.
- *   4. Recursion is guarded by a visited set and a depth cap. Real catalogue
- *      prerequisites should not cycle, but a parser bug could produce one, and
- *      hanging the browser is a worse failure than a flagged error.
+ *   4. Recursion is guarded by a visited set and a depth cap. A course that
+ *      requires ITSELF is always a parse bug and is reported as an error. A
+ *      loop between different courses can be faithful to the catalogue
+ *      (MA PH 351 and MATH 337 each list the other as one alternative), so
+ *      it is not an error: the looping branch is a dead end ON THIS PATH --
+ *      you cannot use X to unlock the very course you need in order to get
+ *      to X -- and the walk takes the other branches. It is recorded in
+ *      `cycles` so the UI can say so neutrally.
  */
 
 export const MAX_DEPTH = 12;
@@ -60,10 +65,46 @@ export function makeCompletedSet(codes) {
   return new Set((codes || []).map(normalizeCode).filter(Boolean));
 }
 
+// "CMPUT 201", "cmput201", "MA PH351", "E E 380", "MATH 30-1", "CMPUT 296A".
+const CODE_SHAPE_RE = /^([A-Z]+(?: [A-Z]+)*)\s*(\d{2,3}[A-Z]{0,2}(?:-\d)?)$/;
+
+/**
+ * Parse what a student types into the completed-courses box.
+ *
+ * The box's own placeholder reads "e.g. CMPUT 201, MATH 125", so a comma
+ * list is the expected input -- yet it used to be stored as ONE code,
+ * "CMPUT 201, MATH 125", which matched nothing and silently changed every
+ * eligibility answer. Likewise "cmput201" never matched "CMPUT 201".
+ *
+ * Returns { codes, invalid }: canonical codes, and the pieces that do not
+ * look like a course code at all, so the UI can say so instead of guessing.
+ */
+export function parseCourseList(input) {
+  const codes = [];
+  const invalid = [];
+  for (const piece of String(input || '').split(/[,;\n]+|\s+and\s+/i)) {
+    const raw = normalizeCode(piece);
+    if (!raw) continue;
+    const m = raw.match(CODE_SHAPE_RE);
+    if (!m) {
+      invalid.push(piece.trim());
+      continue;
+    }
+    const code = m[1] + ' ' + m[2];
+    if (!codes.includes(code)) codes.push(code);
+  }
+  return { codes, invalid };
+}
+
+/** Subjects a LEVEL_MIN accepts: one code, or a department's whole list. */
+export function levelSubjects(node) {
+  return node.subjects && node.subjects.length ? node.subjects : [node.subject];
+}
+
 function reqKey(req) {
   return req.kind === REQ_COURSE
     ? 'c:' + req.code
-    : 'l:' + req.subject + ':' + req.minLevel;
+    : 'l:' + (req.subjects || [req.subject]).join('/') + ':' + req.minLevel;
 }
 
 /** Union of requirement lists, order-preserving and de-duplicated. */
@@ -94,19 +135,31 @@ function unionReqs(lists) {
  *   remaining   the cheapest set of requirements that would satisfy this node
  *   alternatives (OR nodes only) one entry per branch, so the UI can offer a
  *               real choice instead of only the shortest path
- *   error       set when the depth/cycle guard tripped
+ *   deadEnd     this branch cannot be completed on this path (it loops back
+ *               to a course already being unlocked); OR nodes skip it
+ *   error       set when the depth guard tripped or a course requires itself
+ *
+ * `options.root` is the course whose tree this is. It starts on the stack, so
+ * a branch that loops straight back to it is caught at once.
  */
 export function evaluateTree(node, completed, index, options = {}) {
+  const stack = options.stack || new Set();
+  const root = options.root ? normalizeCode(options.root) : null;
+  if (root) stack.add(root);
   const ctx = {
     index,
     completed,
     depth: 0,
-    stack: options.stack || new Set(),
+    root,
+    stack,
     maxDepth: options.maxDepth || MAX_DEPTH,
     errors: options.errors || [],
+    cycles: options.cycles || [],
   };
   const result = walk(node, ctx);
+  if (root) stack.delete(root);
   result.errors = ctx.errors;
+  result.cycles = ctx.cycles;
   return result;
 }
 
@@ -147,12 +200,20 @@ function walkCourse(node, ctx) {
 
   const req = { kind: REQ_COURSE, code, external: !!node.external };
 
-  // Cycle guard: a course that (transitively) requires itself.
   if (ctx.stack.has(code)) {
-    const err = 'Prerequisite cycle detected at ' + code +
-      '. Treating it as a leaf; the parsed data for this chain is likely wrong.';
-    ctx.errors.push(err);
-    return { ...node, satisfied: false, remaining: [req], error: err };
+    // A course naming ITSELF directly is always a parse bug.
+    if (code === ctx.root && ctx.depth === 0) {
+      const err = code + ' lists itself as its own prerequisite. ' +
+        'This is a parsing error; read the calendar text instead.';
+      ctx.errors.push(err);
+      return { ...node, satisfied: false, remaining: [], deadEnd: true, error: err };
+    }
+    // A loop through other courses: a dead end on this path, not an error.
+    const msg = 'One route loops back to ' + code +
+      ' (the catalogue lists these courses as alternatives for each other), ' +
+      'so that route is not counted.';
+    if (!ctx.cycles.includes(msg)) ctx.cycles.push(msg);
+    return { ...node, satisfied: false, remaining: [], deadEnd: true, cycle: true };
   }
 
   const target = ctx.index.get(code);
@@ -173,6 +234,8 @@ function walkCourse(node, ctx) {
   return {
     ...node,
     satisfied: false,
+    // If every way into this course loops back, it is unreachable here too.
+    deadEnd: !!sub.deadEnd,
     // You need the course itself AND whatever unlocks it -- listed in the
     // order you would actually take them, deepest prerequisite first.
     //
@@ -188,17 +251,21 @@ function walkCourse(node, ctx) {
 }
 
 function walkLevelMin(node, ctx) {
+  // A department-wide constraint ("a 200-level Biological Sciences course")
+  // carries every subject it spans; any of them satisfies it.
+  const subjects = levelSubjects(node);
   const match = [...ctx.completed].find(
-    (c) => subjectOf(c) === node.subject && levelOf(c) >= node.min_level
+    (c) => subjects.includes(subjectOf(c)) && levelOf(c) >= node.min_level
   );
   if (match) {
     return { ...node, satisfied: true, remaining: [], satisfiedBy: match };
   }
-  return {
-    ...node,
-    satisfied: false,
-    remaining: [{ kind: REQ_LEVEL, subject: node.subject, minLevel: node.min_level }],
-  };
+  const req = { kind: REQ_LEVEL, subject: node.subject, minLevel: node.min_level };
+  if (node.subjects) {
+    req.subjects = node.subjects;
+    req.label = node.label;
+  }
+  return { ...node, satisfied: false, remaining: [req] };
 }
 
 function walkAnd(node, ctx) {
@@ -208,6 +275,8 @@ function walkAnd(node, ctx) {
     ...node,
     children,
     satisfied,
+    // One unreachable requirement makes the whole AND unreachable.
+    deadEnd: !satisfied && children.some((c) => c.deadEnd),
     // Every unmet branch must be met, so the costs add up.
     remaining: satisfied ? [] : unionReqs(children.filter((c) => !c.satisfied).map((c) => c.remaining)),
   };
@@ -218,11 +287,13 @@ function walkOr(node, ctx) {
   const satisfied = children.some((c) => c.satisfied);
 
   // Each branch is a genuine alternative -- the UI should be able to show all
-  // of them, not just the one we happen to score cheapest.
+  // of them, not just the one we happen to score cheapest. Dead-end branches
+  // (loops) are not alternatives anyone can actually take.
   const alternatives = children
-    .filter((c) => !c.satisfied)
+    .filter((c) => !c.satisfied && !c.deadEnd)
     .map((c) => c.remaining)
     .filter((r) => r.length > 0);
+  const deadEnd = !satisfied && children.every((c) => c.deadEnd);
 
   let remaining = [];
   if (!satisfied && alternatives.length) {
@@ -231,7 +302,7 @@ function walkOr(node, ctx) {
     remaining = alternatives.reduce((best, r) => (r.length < best.length ? r : best));
   }
 
-  return { ...node, children, satisfied, remaining, alternatives };
+  return { ...node, children, satisfied, remaining, alternatives, deadEnd };
 }
 
 // ---------------------------------------------------------------------------
@@ -244,6 +315,8 @@ function walkOr(node, ctx) {
  * @param {Array}  completedCodes course codes the student self-reports
  */
 export function evaluateCourse(courses, targetCode, completedCodes) {
+  // Callers that evaluate repeatedly (the UI, on every keystroke in the
+  // completed list) should pass a prebuilt index; buildIndex is O(n).
   const index = courses instanceof Map ? courses : buildIndex(courses);
   const code = normalizeCode(targetCode);
   const course = index.get(code);
@@ -262,11 +335,11 @@ export function evaluateCourse(courses, targetCode, completedCodes) {
     .filter((c) => completed.has(c));
 
   const alreadyCompleted = completed.has(code);
-  const prereq = evaluateTree(course.prerequisite_tree, completed, index);
+  const prereq = evaluateTree(course.prerequisite_tree, completed, index, { root: code });
 
   // RULE 2: corequisites are evaluated separately and never gate eligibility.
   const coreq = course.corequisite_tree
-    ? evaluateTree(course.corequisite_tree, completed, index)
+    ? evaluateTree(course.corequisite_tree, completed, index, { root: code })
     : null;
 
   // An empty tree means "no prerequisites" ONLY when the parse succeeded.
@@ -285,7 +358,9 @@ export function evaluateCourse(courses, targetCode, completedCodes) {
   const unrepresented = course.unrepresented_requirements || [];
   const cannotJudge =
     course.parse_status === 'unparsed' ||
-    (prereq.satisfied && unrepresented.length > 0);
+    (prereq.satisfied && unrepresented.length > 0) ||
+    // Every route loops back on itself: nothing actionable can be said.
+    !!prereq.deadEnd;
 
   let eligible;
   if (conflicts.length > 0) {
@@ -315,6 +390,8 @@ export function evaluateCourse(courses, targetCode, completedCodes) {
     prerequisitesText: course.prerequisites_text,
     notes: course.notes || [],
     errors: prereq.errors || [],
+    // Loops through other courses: faithful catalogue data, explained, not errors.
+    cycles: prereq.cycles || [],
     // Flat "here is what's left" list, ready to render.
     remaining: prereq.remaining || [],
   };
@@ -323,7 +400,15 @@ export function evaluateCourse(courses, targetCode, completedCodes) {
 /** Human-readable label for one remaining requirement. */
 export function describeRequirement(req) {
   if (req.kind === REQ_LEVEL) {
-    return 'any ' + req.minLevel + '-level ' + req.subject + ' course';
+    return 'any ' + req.minLevel + '-level ' + levelLabel(req) + ' course';
   }
   return req.code + (req.external ? ' (not tracked here — verify yourself)' : '');
+}
+
+/** "CMPUT", or "Biological Sciences (BIOL, BOT, ...)" for a department. */
+export function levelLabel(nodeOrReq) {
+  if (nodeOrReq.subjects && nodeOrReq.subjects.length) {
+    return (nodeOrReq.label || nodeOrReq.subject) + ' (' + nodeOrReq.subjects.join(', ') + ')';
+  }
+  return nodeOrReq.subject;
 }

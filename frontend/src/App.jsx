@@ -1,17 +1,27 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import PrereqTree from './components/PrereqTree.jsx';
 import CoreqLine from './components/CoreqLine.jsx';
 import PrintOutline from './components/PrintOutline.jsx';
-import { evaluateCourse, describeRequirement, normalizeCode } from './lib/evalEngine.js';
+import {
+  buildIndex,
+  evaluateCourse,
+  describeRequirement,
+  parseCourseList,
+} from './lib/evalEngine.js';
 import { loadCompleted, saveCompleted } from './lib/storage.js';
 import { usePrintTitle } from './lib/usePrintTitle.js';
+import { safeHref, codeFromHash, hashForCode } from './lib/links.js';
 
 const STATUS_BADGE = {
   parsed: { text: 'parsed', className: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
   partial: { text: 'partial parse', className: 'bg-amber-100 text-amber-900 border-amber-300' },
   unparsed: { text: 'not machine-readable', className: 'bg-rose-100 text-rose-900 border-rose-300' },
 };
+// An unexpected status in the data must not white-screen the page.
+const UNKNOWN_BADGE = { text: 'unknown confidence', className: 'bg-slate-100 text-slate-800 border-slate-300' };
+
+const SEARCH_LIMIT = 40;
 
 /**
  * DESIGN.md makes this disclaimer a UI element rather than a footnote on
@@ -37,12 +47,18 @@ function Disclaimer() {
 
 function CompletedCourses({ completed, setCompleted, index }) {
   const [draft, setDraft] = useState('');
+  const [rejected, setRejected] = useState([]);
 
+  // The placeholder invites "CMPUT 201, MATH 125", so a list is split into
+  // separate codes, "cmput201" is canonicalised to "CMPUT 201", and anything
+  // that is not course-shaped is shown back rather than stored.
   const add = (raw) => {
-    const code = normalizeCode(raw);
-    if (!code) return;
-    if (!completed.includes(code)) setCompleted([...completed, code]);
-    setDraft('');
+    const { codes, invalid } = parseCourseList(raw);
+    const fresh = codes.filter((c) => !completed.includes(c));
+    if (fresh.length) setCompleted([...completed, ...fresh]);
+    setRejected(invalid);
+    // Keep what could not be read in the box so it can be corrected.
+    setDraft(invalid.join(', '));
   };
 
   const unknown = completed.filter((c) => !index.has(c));
@@ -76,6 +92,13 @@ function CompletedCourses({ completed, setCompleted, index }) {
           Add
         </button>
       </form>
+
+      {rejected.length > 0 && (
+        <p role="alert" className="mt-2 text-xs text-rose-800">
+          Not a course code, so not added: {rejected.join(', ')}. Use the form
+          &ldquo;CMPUT 201&rdquo;.
+        </p>
+      )}
 
       {completed.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-2">
@@ -162,16 +185,18 @@ function CatalogueFallback({ course, parseStatus }) {
         </div>
       )}
 
-      <p className="mt-3 text-sm">
-        <a
-          className="font-medium text-amber-900 underline underline-offset-2"
-          href={course.source_url}
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Read {course.code} in the official UAlberta catalogue →
-        </a>
-      </p>
+      {safeHref(course.source_url) && (
+        <p className="mt-3 text-sm">
+          <a
+            className="font-medium text-amber-900 underline underline-offset-2"
+            href={safeHref(course.source_url)}
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Read {course.code} in the official UAlberta catalogue →
+          </a>
+        </p>
+      )}
     </div>
   );
 }
@@ -255,7 +280,7 @@ function OptionsPanel({ result }) {
       {alternatives.length > 1 && (
         <div className="mt-4">
           <p className="text-sm font-medium text-slate-800">
-            Other routes that also work (any one of):
+            Every route that works (any one of these):
           </p>
           <ul className="mt-2 space-y-1 text-sm text-slate-700">
             {alternatives.map((alt, i) => (
@@ -275,8 +300,28 @@ export default function App() {
   const [loadError, setLoadError] = useState(null);
   const [query, setQuery] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('');
-  const [selected, setSelected] = useState(null);
+  // The viewed course lives in the URL hash, so a link or a refresh lands on
+  // the same course and the back button steps through what was viewed.
+  const [selected, setSelected] = useState(() => codeFromHash(window.location.hash));
   const [completed, setCompleted] = useState(loadCompleted);
+
+  const selectCourse = useCallback((code) => {
+    setSelected(code);
+    const hash = hashForCode(code);
+    if (window.location.hash !== hash) {
+      window.history.pushState(null, '', hash || window.location.pathname);
+    }
+  }, []);
+
+  useEffect(() => {
+    const onNavigate = () => setSelected(codeFromHash(window.location.hash));
+    window.addEventListener('popstate', onNavigate);
+    window.addEventListener('hashchange', onNavigate);
+    return () => {
+      window.removeEventListener('popstate', onNavigate);
+      window.removeEventListener('hashchange', onNavigate);
+    };
+  }, []);
 
   useEffect(() => {
     fetch('courses.json')
@@ -292,29 +337,35 @@ export default function App() {
     saveCompleted(completed);
   }, [completed]);
 
-  const courses = data ? data.courses : [];
-  const index = useMemo(() => new Map(courses.map((c) => [c.code, c])), [courses]);
+  const courses = useMemo(() => (data ? data.courses : []), [data]);
+  // Built once per dataset and shared with the engine, so changing the
+  // completed list does not rebuild a 1,277-entry index on every edit. Keys
+  // are normalised the same way the engine normalises its lookups.
+  const index = useMemo(() => buildIndex(courses), [courses]);
   const subjects = useMemo(
     () => [...new Set(courses.map((c) => c.subject))].sort(),
     [courses]
   );
 
-  const matches = useMemo(() => {
+  const { matches, totalMatches } = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // "cmput301" should find "CMPUT 301" too.
+    const qCompact = q.replace(/\s+/g, '');
     const pool = subjectFilter ? courses.filter((c) => c.subject === subjectFilter) : courses;
-    if (!q) return pool.slice(0, 40);
-    return pool
-      .filter(
+    const hits = q
+      ? pool.filter(
         (c) =>
           c.code.toLowerCase().includes(q) ||
-          (c.title || '').toLowerCase().includes(q)
+            c.code.toLowerCase().replace(/\s+/g, '').includes(qCompact) ||
+            (c.title || '').toLowerCase().includes(q)
       )
-      .slice(0, 40);
+      : pool;
+    return { matches: hits.slice(0, SEARCH_LIMIT), totalMatches: hits.length };
   }, [courses, query, subjectFilter]);
 
   const result = useMemo(
-    () => (selected && courses.length ? evaluateCourse(courses, selected, completed) : null),
-    [courses, selected, completed]
+    () => (selected && index.size ? evaluateCourse(index, selected, completed) : null),
+    [index, selected, completed]
   );
 
   // `selected` is the single source of truth for both the on-screen heading and
@@ -345,7 +396,7 @@ export default function App() {
           {data.course_count} University of Alberta courses ({subjects.join(', ')}), scraped from{' '}
           <a
             className="underline"
-            href={data.source}
+            href={safeHref(data.source)}
             target="_blank"
             rel="noreferrer noopener"
           >
@@ -414,7 +465,7 @@ export default function App() {
                 <li key={c.code}>
                   <button
                     type="button"
-                    onClick={() => setSelected(c.code)}
+                    onClick={() => selectCourse(c.code)}
                     className={
                       'w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-slate-100 ' +
                       (selected === c.code ? 'bg-slate-900 text-white hover:bg-slate-900' : '')
@@ -431,6 +482,12 @@ export default function App() {
                 <li className="px-2 py-1 text-sm text-slate-500">No matching course.</li>
               )}
             </ul>
+            {totalMatches > matches.length && (
+              <p className="mt-2 text-xs text-slate-500">
+                Showing {matches.length} of {totalMatches} — type more of a code or
+                title, or pick a subject, to narrow the list.
+              </p>
+            )}
           </section>
         </div>
 
@@ -478,19 +535,21 @@ export default function App() {
                     <span
                       className={
                         'rounded border px-2 py-0.5 text-xs font-medium ' +
-                        STATUS_BADGE[result.parseStatus].className
+                        (STATUS_BADGE[result.parseStatus] || UNKNOWN_BADGE).className
                       }
                     >
-                      {STATUS_BADGE[result.parseStatus].text}
+                      {(STATUS_BADGE[result.parseStatus] || UNKNOWN_BADGE).text}
                     </span>
-                    <a
-                      className="text-xs text-slate-500 underline"
-                      href={result.course.source_url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                    >
-                      official catalogue entry
-                    </a>
+                    {safeHref(result.course.source_url) && (
+                      <a
+                        className="text-xs text-slate-500 underline"
+                        href={safeHref(result.course.source_url)}
+                        target="_blank"
+                        rel="noreferrer noopener"
+                      >
+                        official catalogue entry
+                      </a>
+                    )}
                   </div>
 
                   {/* The raw text stays visible always -- it is the fallback
@@ -509,7 +568,7 @@ export default function App() {
                   )}
                 </div>
 
-                <CatalogueFallback result={result} course={result.course} parseStatus={result.parseStatus} />
+                <CatalogueFallback course={result.course} parseStatus={result.parseStatus} />
 
                 <OptionsPanel result={result} />
 
@@ -521,11 +580,22 @@ export default function App() {
                   </div>
                 )}
 
+                {/* Loops are real catalogue data (MA PH 351 and MATH 337 list
+                    each other as alternatives), so they are explained in a
+                    neutral note -- never shown as a red parse error. */}
+                {result.cycles.length > 0 && (
+                  <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+                    {result.cycles.map((e, i) => (
+                      <p key={i}>{e}</p>
+                    ))}
+                  </div>
+                )}
+
                 <section className="rounded-lg border border-slate-200 bg-white p-4">
                   <h3 className="mb-3 font-semibold">Prerequisite tree</h3>
                   <PrereqTree
                     node={result.prerequisite}
-                    onSelect={setSelected}
+                    onSelect={selectCourse}
                     unparsed={result.parseStatus === 'unparsed'}
                   />
                 </section>
@@ -539,11 +609,11 @@ export default function App() {
                       A corequisite is taken in the same term — it does not have to be
                       finished first, and it does not affect the eligibility check above.
                     </p>
-                    <CoreqLine node={result.corequisite} onSelect={setSelected} />
+                    <CoreqLine node={result.corequisite} onSelect={selectCourse} />
                   </section>
                 )}
 
-                {result.course.credit_exclusions.length > 0 && (
+                {(result.course.credit_exclusions || []).length > 0 && (
                   <section className="rounded-lg border border-slate-200 bg-white p-4 text-sm">
                     <h3 className="font-semibold">Credit exclusions</h3>
                     <p className="mt-1 text-slate-700">

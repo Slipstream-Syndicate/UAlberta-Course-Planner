@@ -111,7 +111,14 @@ DEPARTMENT_ALIASES = {
     "earth and atmospheric sciences": "EAS",
     "psychology": "PSYCH",
 }
-BROAD_DEPARTMENT_CODES = {"BIOL"}  # spans more subjects than the code implies
+# A department name that spans several subject codes. A LEVEL_MIN naming one
+# of these carries the whole list (`subjects` on the node), so "a 200-level
+# Biological Sciences course" is satisfied by ZOOL 250 as well as BIOL 207 --
+# resolving it to BIOL alone told a student with ZOOL 250 they still had
+# something left to take.
+DEPARTMENT_SUBJECTS = {
+    "biological sciences": ["BIOL", "BOT", "ENT", "GENET", "MICRB", "ZOOL"],
+}
 
 ROW_RE = re.compile(r"^\s*([A-Z][A-Z0-9]*(?: [A-Z][A-Z0-9]*)*)\s+-\s+(.+?)\s*$")
 LINK_RE = re.compile(r"^/catalogue/course/([a-z0-9_-]+)$")

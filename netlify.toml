@@ -20,8 +20,15 @@
   to = "/index.html"
   status = 200
 
+# The built page has no inline scripts or styles and no eval (checked against
+# `vite build` output), so the policy can be strict: everything from this
+# origin only. If a future change needs inline code, fix the change -- do not
+# loosen this to 'unsafe-inline'.
 [[headers]]
   for = "/*"
   [headers.values]
+    Content-Security-Policy = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"

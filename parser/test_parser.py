@@ -26,6 +26,7 @@ from parser import (  # noqa: E402
     or_node,
     and_node,
     level_min_node,
+    _codes_in,
 )
 
 PASSED = 0
@@ -551,6 +552,149 @@ def test_math_parenthetical_aside_is_not_a_requirement():
     check("aside is not in the tree", r["tree"], M("MATH", "326"))
     check("aside is recorded as a note",
           any("MATH 322" in n for n in r["notes"]), True)
+
+
+# ---------------------------------------------------------------------------
+# QC regressions. Each fixture is real catalogue text that the parser got
+# wrong at some point; the comment names the course it came from.
+# ---------------------------------------------------------------------------
+
+def shape(node):
+    """A tree as a compact string, ignoring `external` (which depends on the
+    dataset, not the parser) so these tests pin the STRUCTURE."""
+    if not node:
+        return "None"
+    if node["type"] == "COURSE":
+        return node["code"]
+    if node["type"] == "LEVEL_MIN":
+        subs = "/".join(node.get("subjects") or [node["subject"]])
+        return "LEVEL({}>={})".format(subs, node["min_level"])
+    return node["type"] + "[" + ", ".join(shape(c) for c in node["children"]) + "]"
+
+
+def P(text, home):
+    return parse_prerequisite_text(text, home)
+
+
+def test_qc_trailing_or_list_without_serial_comma():
+    """MATH 228: 'MATH 102, 125 or 127' is ANY ONE of three. Reading the bare
+    comma as AND shipped 'MATH 102 AND (125 OR 127)' marked `parsed`."""
+    r = P("Prerequisite: MATH 102, 125 or 127.", "MATH")
+    check("228 status", r["parse_status"], "parsed")
+    check("228 tree", shape(r["tree"]), "OR[MATH 102, MATH 125, MATH 127]")
+    r = P("Prerequisites: PSYCH 350, 354, 356 or 357.", "PSYCH")
+    check("458-shape tree", shape(r["tree"]), "OR[PSYCH 350, PSYCH 354, PSYCH 356, PSYCH 357]")
+
+
+def test_qc_or_list_before_and_one_of():
+    """ASTRO 320: the ' and one of' is the top-level join, not the comma."""
+    r = P("Prerequisites: MATH 101, 115, 118, 136, 146 or 156 and one of PHYS 208 or 271.", "ASTRO")
+    check("ASTRO 320 tree", shape(r["tree"]),
+          "AND[OR[MATH 101, MATH 115, MATH 118, MATH 136, MATH 146, MATH 156], OR[PHYS 208, PHYS 271]]")
+
+
+def test_qc_trailing_or_group_with_several_ors_stays_anded():
+    """PHYS 372 / PSYCH 405: a last item that is its own multi-way OR is a
+    separate requirement; the trailing-OR-list rule must not fire."""
+    r = P("Prerequisites: PHYS 244, PHYS 271, MATH 334 or 336 or 201 or MA PH 251.", "PHYS")
+    check("372 status", r["parse_status"], "parsed")
+    check("372 tree", shape(r["tree"]),
+          "AND[PHYS 244, PHYS 271, OR[MATH 334, MATH 336, MATH 201, MA PH 251]]")
+    # CMPUT 411's requirement-separating comma is unchanged.
+    r = P("Prerequisite: CMPUT 204 or 275, 301.", "CMPUT")
+    check("411 still AND", shape(r["tree"]), "AND[OR[CMPUT 204, CMPUT 275], CMPUT 301]")
+
+
+def test_qc_mixed_subject_list_is_flagged_ambiguous():
+    """EAS 250: 'EAS 100, BIOL 108 or SCI 100' could mean either reading.
+    Keep the conservative AND, but never claim a clean parse for it."""
+    r = P("Prerequisite: EAS 100, BIOL 108 or SCI 100.", "EAS")
+    check("EAS 250 status", r["parse_status"], "partial")
+    check("EAS 250 keeps the conservative reading", shape(r["tree"]),
+          "AND[EAS 100, OR[BIOL 108, SCI 100]]")
+    check("EAS 250 is recorded as unrepresented",
+          any(u.startswith("ambiguous grouping") for u in r["unrepresented"]), True)
+
+
+def test_qc_minimum_grade_keeps_the_course():
+    """The grade is informational; the course it qualifies is required."""
+    r = P("Prerequisites: CMPUT 201 and CMPUT 175 with a minimum grade of C-.", "CMPUT")
+    check("grade suffix keeps course", shape(r["tree"]), "AND[CMPUT 201, CMPUT 175]")
+    check("grade suffix is partial", r["parse_status"], "partial")
+    r = P("Prerequisite: a minimum grade of B in MATH 125.", "MATH")
+    check("grade prefix keeps course", shape(r["tree"]), "MATH 125")
+
+
+def test_qc_informational_fragment_naming_a_course_is_unrepresented():
+    """A dropped 'informational' fragment that names a course must be
+    reported as unrepresented, never dropped quietly."""
+    r = P("Prerequisites: STAT 151 and restricted to students with credit in STAT 141.", "STAT")
+    check("restricted fragment recorded",
+          any("STAT 141" in u for u in r["unrepresented"]), True)
+
+
+def test_qc_bare_numbers_use_the_courses_own_subject():
+    """'361 or 362' in a CHEM course is CHEM, not CMPUT."""
+    r = P("Prerequisite: 361 or 362.", "CHEM")
+    check("home subject", shape(r["tree"]), "OR[CHEM 361, CHEM 362]")
+    check("credit exclusions use home subject",
+          extract_credit_exclusions("Credit may be obtained in only one of 102, 125 or 127.",
+                                    self_code="MATH 127", home_subject="MATH"),
+          ["MATH 102", "MATH 125"])
+
+
+def test_qc_title_case_subject_code():
+    """CHEM 460 writes 'Chem 361'."""
+    r = P("Prerequisites: Chem 361 or consent of instructor.", "CHEM")
+    check("Chem 361 -> CHEM 361", shape(r["tree"]), "CHEM 361")
+
+
+def test_qc_quantities_are_not_course_numbers():
+    """'30 units' is a quantity, not a course called CMPUT 30."""
+    check("units are not codes", _codes_in("a minimum of 30 units or consent", "INT D"), [])
+    r = P("Prerequisites: BIOL 322 or any 300 level MICRB course.", "MICRB")
+    check("'300 level' without hyphen", shape(r["tree"]), "OR[BIOL 322, LEVEL(MICRB>=300)]")
+
+
+def test_qc_codes_in_offsets_use_the_expanded_text():
+    """Context checks used offsets from the expanded string against the
+    original one and dropped 302 here."""
+    check("302 survives", _codes_in("only one of CMPUT 301, 302 (Fall) or MATH 300"),
+          ["CMPUT 301", "CMPUT 302", "MATH 300"])
+
+
+def test_qc_sentence_boundary_and_repeated_labels():
+    """BIOL 392 and PHYS 181 carry a second label inside the field."""
+    r = P("Prerequisite: BIOL 207 and BIOL 208. Pre-requisite: BIOL 380.", "BIOL")
+    check("BIOL 392 tree", shape(r["tree"]), "AND[BIOL 207, BIOL 208, BIOL 380]")
+    r = P("Prerequisite: Prerequisite: PHYS 124 or 144 or EN PH 131.", "PHYS")
+    check("PHYS 181 tree", shape(r["tree"]), "OR[PHYS 124, PHYS 144, EN PH 131]")
+    r = P("Prerequisite CHEM 261 or 266. Prerequisite or co- requisite: CHEM265.", "CHEM")
+    check("CHEM 267 prereq tree excludes the coreq option", shape(r["tree"]), "OR[CHEM 261, CHEM 266]")
+
+
+def test_qc_any_one_of_slash_lists_and_stray_comma():
+    r = P("Prerequisite: Any one of ENT 220, 222, or REN R 205, or ZOOL 250.", "ENT")
+    check("ENT 327 any one of", shape(r["tree"]), "OR[ENT 220, ENT 222, REN R 205, ZOOL 250]")
+    r = P("Prerequisites: GENET 270, MICRB 265 and BIOCH 203/205 or BIOCH 200.", "MICRB")
+    check("MICRB 316 slash list", shape(r["tree"]),
+          "AND[GENET 270, MICRB 265, OR[BIOCH 203, BIOCH 205, BIOCH 200]]")
+    r = P("Prerequisites: PSYCH 212 and, PSYCH 213 or STAT 151 or STAT 161.", "PSYCH")
+    check("PSYCH 315 stray comma", shape(r["tree"]),
+          "AND[PSYCH 212, OR[PSYCH 213, STAT 151, STAT 161]]")
+
+
+def test_qc_except_is_refused_not_inverted():
+    """INT D 420: courses named after 'except' are NOT requirements."""
+    r = P("Prerequisites: All courses in the BScN program except NURS 422, NURS 425 and NURS 485.", "INT D")
+    check("except -> unparsed", r["parse_status"], "unparsed")
+    check("except -> no tree claiming NURS 425 is required", r["tree"], None)
+
+
+def test_qc_department_level_spans_its_subjects():
+    """'a 200-level Biological Sciences course' accepts ZOOL/BOT/... too."""
+    r = P("Prerequisite: a 200-level Biological Sciences course.", "ZOOL")
+    check("department LEVEL_MIN", shape(r["tree"]), "LEVEL(BIOL/BOT/ENT/GENET/MICRB/ZOOL>=200)")
 
 
 def main():

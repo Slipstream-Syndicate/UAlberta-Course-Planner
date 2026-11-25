@@ -18,6 +18,7 @@ import { dirname, resolve } from 'node:path';
 import {
   evaluateCourse,
   describeRequirement,
+  parseCourseList,
   MAX_DEPTH,
 } from './evalEngine.js';
 
@@ -166,12 +167,63 @@ console.log('deeper chain: unsatisfied courses expand to show what unlocks them'
 console.log('cycle and depth guards fail loudly instead of hanging');
 {
   const mutual = evaluateCourse(FIXTURES, 'CMPUT 900', []);
-  check('mutual cycle is detected', mutual.errors.length > 0, true);
-  check('mutual cycle error names the course',
-    mutual.errors.some((e) => e.includes('cycle')), true);
+  check('mutual loop is detected', mutual.cycles.length > 0, true);
+  check('a loop between two courses is NOT reported as a data error', mutual.errors, []);
+  check('the loop names the course it returns to',
+    mutual.cycles.some((e) => e.includes('CMPUT 900')), true);
+  // 900 needs 901, which needs 900: no route exists, so no honest answer.
+  check('a tree that only loops cannot be judged', mutual.eligible, null);
   const self = evaluateCourse(FIXTURES, 'CMPUT 902', []);
-  check('self-referencing course is detected', self.errors.length > 0, true);
+  check('self-referencing course is reported as an error', self.errors.length > 0, true);
   check('guarded result still returns rather than hanging', self.found, true);
+}
+
+console.log('a looping branch is a dead end; the other branches still work');
+{
+  // The real MA PH 351 / MATH 337 shape: each lists the other as ONE of
+  // several alternatives.
+  const fx = [
+    course('MATH 337', { prerequisite_tree: OR(C('MA PH 351'), C('MATH 217')) }),
+    course('MA PH 351', { prerequisite_tree: OR(C('MATH 337'), C('MATH 209')) }),
+    course('MATH 217'),
+    course('MATH 209'),
+  ];
+  const r = evaluateCourse(fx, 'MATH 337', []);
+  check('looping branch is not an error', r.errors, []);
+  check('the loop is explained', r.cycles.length, 1);
+  check('eligibility is still a real answer', r.eligible, false);
+  check('cheapest route ignores the loop', codesOf(r.remaining), ['MATH 217']);
+  check('the route through MA PH 351 uses its other branch',
+    r.prerequisite.alternatives.map(codesOf), [['MATH 209', 'MA PH 351'], ['MATH 217']]);
+  check('taking that route works', evaluateCourse(fx, 'MATH 337', ['MATH 209', 'MA PH 351']).eligible, true);
+}
+
+console.log('department-wide LEVEL_MIN accepts every subject it spans');
+{
+  const dept = { type: 'LEVEL_MIN', subject: 'BIOL', min_level: 200,
+    subjects: ['BIOL', 'BOT', 'ZOOL'], label: 'Biological Sciences' };
+  const fx = [course('BIOL 335', { prerequisite_tree: dept })];
+  check('ZOOL 250 satisfies "a 200-level Biological Sciences course"',
+    evaluateCourse(fx, 'BIOL 335', ['ZOOL 250']).eligible, true);
+  check('PHYS 250 does not', evaluateCourse(fx, 'BIOL 335', ['PHYS 250']).eligible, false);
+  check('the requirement is described with its subjects',
+    describeRequirement(evaluateCourse(fx, 'BIOL 335', []).remaining[0]),
+    'any 200-level Biological Sciences (BIOL, BOT, ZOOL) course');
+}
+
+console.log('parsing what a student types into the completed-courses box');
+{
+  check('comma list (the placeholder example)', parseCourseList('CMPUT 201, MATH 125').codes,
+    ['CMPUT 201', 'MATH 125']);
+  check('no space, lower case', parseCourseList('cmput201').codes, ['CMPUT 201']);
+  check('multi-token subjects', parseCourseList('E E 380; MA PH351').codes, ['E E 380', 'MA PH 351']);
+  check('suffixes and high-school codes', parseCourseList('CMPUT 296A, Math 30-1').codes,
+    ['CMPUT 296A', 'MATH 30-1']);
+  check('"and" separates too, duplicates collapse',
+    parseCourseList('CMPUT 174 and CMPUT 174').codes, ['CMPUT 174']);
+  check('junk is reported, not stored', parseCourseList('CMPUT 201, hello, 201'),
+    { codes: ['CMPUT 201'], invalid: ['hello', '201'] });
+  check('empty input', parseCourseList('  ,  '), { codes: [], invalid: [] });
 }
 
 console.log('eligibility is three-valued: an unreadable course never reports "eligible"');
@@ -264,25 +316,25 @@ if (existsSync(COURSES_JSON)) {
   // faithful, so the requirement is not "no cycles" but "cycles are caught and
   // reported instead of spinning".
   const withErrors = [];
+  const withCycles = [];
   for (const c of real) {
     const res = evaluateCourse(real, c.code, []);
     if (!res.found) throw new Error('did not evaluate: ' + c.code);
     if (res.errors && res.errors.length) withErrors.push(c.code);
+    if (res.cycles && res.cycles.length) withCycles.push(c.code);
   }
   check('every course in the real dataset evaluates without hanging', true, true);
-  check('any cycle is reported as a flagged error, not silently swallowed',
-    withErrors.every((code) =>
-      evaluateCourse(real, code, []).errors.some((e) => /cycle|levels/.test(e))),
-    true);
-  // Count distinct cycles, not courses touching one. A single MA PH 351 <->
-  // MATH 337 cycle is reached transitively by ~26 PHYS/GEOPH/MATH courses, so
-  // counting affected courses measures how well-connected the graph is, not
-  // how much is wrong. The number that must stay small is the set of points
-  // where a cycle is actually detected.
+  // Real loops are faithful catalogue data, so they must never surface as a
+  // red "parse error" -- and no course in the shipped data may require itself.
+  check('no course in the real dataset raises an engine error', withErrors, []);
+  // Count distinct loop points, not courses touching one. A single MA PH 351
+  // <-> MATH 337 loop is reached transitively by ~26 PHYS/GEOPH/MATH courses,
+  // so counting affected courses measures how connected the graph is, not
+  // how much is wrong.
   const cyclePoints = new Set();
-  for (const code of withErrors) {
-    for (const e of evaluateCourse(real, code, []).errors) {
-      const m = e.match(/cycle detected at ([A-Z][A-Z ]*\d+\w*)/);
+  for (const code of withCycles) {
+    for (const e of evaluateCourse(real, code, []).cycles) {
+      const m = e.match(/loops back to ([A-Z][A-Z ]*\d+\w*)/);
       if (m) cyclePoints.add(m[1]);
     }
   }

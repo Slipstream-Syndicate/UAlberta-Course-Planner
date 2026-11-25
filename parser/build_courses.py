@@ -1,5 +1,5 @@
 """
-CMPUT Prerequisite Explorer -- ETL step (Phase 1)
+UAlberta Prerequisite Explorer -- ETL step (Phase 1)
 
 data/courses_raw.json  --(parser.py)-->  data/courses.json
 
@@ -36,7 +36,7 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 RAW_PATH = DATA_DIR / "courses_raw.json"
 OUT_PATH = DATA_DIR / "courses.json"
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2: per-course subject threading, `subjects` list, LEVEL_MIN `subjects`
 
 
 def course_level(code: str) -> int:
@@ -75,13 +75,19 @@ def build(raw: list) -> list:
     courses = []
     for r in raw:
         code = r["code"]
-        prereq = parse_prerequisite_text(r.get("prerequisites_text"))
-        coreq = parse_corequisite_text(r.get("corequisites_text"))
+        # The course's OWN subject. A bare number at the start of a sentence
+        # ("361 or 362") and a subject-less "any 200-level course" both resolve
+        # against it. Omitting it silently defaulted every one of the 31
+        # subjects to CMPUT.
+        home = subject_of(code)
+        prereq = parse_prerequisite_text(r.get("prerequisites_text"), home)
+        coreq = parse_corequisite_text(r.get("corequisites_text"), home)
 
         # Credit exclusions come from two places: the dedicated exclusion
         # sentences the scraper split out, and any course the parser found
         # sitting inside a negation window in the prerequisite text.
-        exclusions = extract_credit_exclusions(r.get("credit_exclusion_text"), self_code=code)
+        exclusions = extract_credit_exclusions(
+            r.get("credit_exclusion_text"), self_code=code, home_subject=home)
         for c in prereq["credit_exclusion_candidates"]:
             if c != code and c not in exclusions:
                 exclusions.append(c)
@@ -202,12 +208,13 @@ def report(courses: list) -> None:
         collect_referenced_codes(c["prerequisite_tree"], referenced)
         collect_referenced_codes(c["corequisite_tree"], referenced)
     external = sorted(referenced - known)
-    print("\nExternal (non-CMPUT / unscraped) course references: {}".format(len(external)))
+    print("\nExternal (unscraped) course references: {}".format(len(external)))
     print("  " + ", ".join(external))
 
-    dangling = sorted(r for r in referenced if r.startswith("CMPUT ") and r not in known)
+    scraped = {c["subject"] for c in courses}
+    dangling = sorted(r for r in referenced if subject_of(r) in scraped and r not in known)
     if dangling:
-        print("\n  WARNING: CMPUT codes referenced but not in the dataset: {}".format(dangling))
+        print("\n  WARNING: codes in scraped subjects but not in the dataset: {}".format(dangling))
 
     print("\nCoverage: {}/{} courses have a prerequisite tree".format(
         sum(1 for c in courses if c["prerequisite_tree"]), total))
@@ -231,8 +238,8 @@ def main():
     if not args.report:
         payload = {
             "schema_version": SCHEMA_VERSION,
-            "source": "https://apps.ualberta.ca/catalogue/course/cmput",
-            "subject": "CMPUT",
+            "source": "https://apps.ualberta.ca/catalogue/course",
+            "subjects": sorted({c["subject"] for c in courses}),
             "course_count": len(courses),
             "courses": courses,
         }

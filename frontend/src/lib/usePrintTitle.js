@@ -22,7 +22,7 @@ import { useEffect } from 'react';
  * print filename are derived from the SAME `course.code` the page header
  * renders. One source of truth: editing one cannot drift from the other.
  */
-export const APP_TITLE = 'CMPUT Prerequisite Explorer';
+export const APP_TITLE = 'UAlberta Prerequisite Explorer';
 
 /** The one place the print filename is computed, from the same course.code
  *  that drives the on-page header. */

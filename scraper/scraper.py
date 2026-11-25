@@ -1,5 +1,5 @@
 """
-CMPUT Prerequisite Explorer -- Scraper (Phases 1 and 5)
+UAlberta Prerequisite Explorer -- Scraper (Phases 1 and 5)
 
 Fetches one or more UAlberta subject catalogues and writes data/courses_raw.json with
 *raw* fields only. No prerequisite-logic parsing happens here -- that is
@@ -74,11 +74,14 @@ def subject_code_for(slug: str) -> str:
 
 def index_url_for(slug: str) -> str:
     return BASE + "/catalogue/course/" + slug.lower()
-USER_AGENT = (
-    "CMPUT-Prereq-Explorer/1.0 (UAlberta student project, course-planning tool; "
-    "contact: github.com/Slipstream-Syndicate/UAlberta-Course-Planner) python-requests"
-)
+# One identifying User-Agent for every request this project makes.
+USER_AGENT = _subjects.USER_AGENT
 REQUEST_DELAY_SECONDS = 1.0  # DESIGN.md "Scraper etiquette"
+# Retries are for transient failures only, and back off well past the normal
+# delay: a 429 or 5xx means the site wants fewer requests, not faster ones.
+MAX_ATTEMPTS = 3
+RETRY_STATUS = {429, 500, 502, 503, 504}
+BACKOFF_SECONDS = 10.0
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 HTML_CACHE_DIR = DATA_DIR / "html_cache"
@@ -101,9 +104,12 @@ TERM_MARKER_RE = re.compile(r"^(?:Fall|Winter|Spring|Summer)\s+Term\s+\d{4}$", r
 # next label", which would over-capture everything to the end of the text.
 # ---------------------------------------------------------------------------
 
-# Don't split on the period inside these.
-_ABBREV = r"(?<!\be\.g)(?<!\bi\.e)(?<!\bBSc)(?<!\bMSc)(?<!\bDr)(?<!\bNo)"
-SENTENCE_SPLIT_RE = re.compile(_ABBREV + r"(?<=[.;])\s+(?=[A-Z(])")
+# Don't split on the period inside these. Each lookbehind includes the period
+# itself: the split point sits AFTER the ".", so a guard written as "e\.g"
+# (no trailing period) compared the wrong three characters and never fired --
+# "e.g. CMPUT 201" was split into two sentences.
+_ABBREV = r"(?<!\be\.g\.)(?<!\bi\.e\.)(?<!\bBSc\.)(?<!\bMSc\.)(?<!\bDr\.)(?<!\bNo\.)"
+SENTENCE_SPLIT_RE = re.compile(r"(?<=[.;])" + _ABBREV + r"\s+(?=[A-Z(])")
 
 PREREQ_LABEL_RE = re.compile(r"\bPre-?requisites?\b\s*:?", re.I)
 COREQ_LABEL_RE = re.compile(r"\bCo-?requisites?\b\s*:?", re.I)
@@ -191,11 +197,24 @@ def fetch(url: str, cache_key: str, refresh: bool = False) -> str:
     if cache_path.exists() and not refresh:
         return cache_path.read_text(encoding="utf-8")
 
-    resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
-    resp.raise_for_status()
-    cache_path.write_text(resp.text, encoding="utf-8")
-    time.sleep(REQUEST_DELAY_SECONDS)
-    return resp.text
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            resp = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=30)
+        except (requests.ConnectionError, requests.Timeout):
+            if attempt == MAX_ATTEMPTS:
+                raise
+            time.sleep(BACKOFF_SECONDS * attempt)
+            continue
+        if resp.status_code in RETRY_STATUS and attempt < MAX_ATTEMPTS:
+            retry_after = resp.headers.get("Retry-After", "")
+            wait = float(retry_after) if retry_after.isdigit() else BACKOFF_SECONDS * attempt
+            time.sleep(wait)
+            continue
+        resp.raise_for_status()
+        cache_path.write_text(resp.text, encoding="utf-8")
+        time.sleep(REQUEST_DELAY_SECONDS)
+        return resp.text
+    raise requests.RequestException("unreachable: retries exhausted for " + url)
 
 
 @dataclass
@@ -431,7 +450,7 @@ def parse_course_page(html: str, number: str, url: str, subject: str) -> RawCour
     )
 
 
-def run_subject(slug, limit=None, debug=False, refresh=False):
+def run_subject(slug, limit=None, debug=False, refresh=False, failures=None):
     subject = subject_code_for(slug)
     index_url = index_url_for(slug)
     print("")
@@ -448,6 +467,10 @@ def run_subject(slug, limit=None, debug=False, refresh=False):
             html = fetch(url, cache_key=slug.lower() + "_" + num, refresh=refresh)
         except requests.RequestException as e:
             print("  [{}/{}] ERROR fetching {}: {}".format(i, len(numbers), url, e), file=sys.stderr)
+            # Recorded, not swallowed: a course that silently drops out of the
+            # dataset is indistinguishable from one that does not exist.
+            if failures is not None:
+                failures.append(url)
             continue
         entry = parse_course_page(html, num, url, subject)
         entries.append(entry)
@@ -465,11 +488,31 @@ def run_subject(slug, limit=None, debug=False, refresh=False):
     return entries
 
 
-def run(subjects, limit=None, debug=False, refresh=False) -> list[RawCourseEntry]:
+def run(subjects, limit=None, debug=False, refresh=False, failures=None) -> list[RawCourseEntry]:
     entries: list[RawCourseEntry] = []
     for slug in subjects:
-        entries.extend(run_subject(slug, limit=limit, debug=debug, refresh=refresh))
+        entries.extend(run_subject(slug, limit=limit, debug=debug, refresh=refresh,
+                                   failures=failures))
     return entries
+
+
+def merge_into_existing(new_entries: list[dict], existing: list[dict]) -> list[dict]:
+    """Replace only the subjects that were just scraped; keep the rest.
+
+    Scraping `--subjects math` used to overwrite courses_raw.json with MATH
+    alone, silently deleting the other 30 subjects -- and the README's own
+    "adding the next subject" recipe did exactly that. Subjects keep their
+    position in the file, and newly added ones go at the end."""
+    scraped = {e["subject"] for e in new_entries}
+    by_subject: dict[str, list[dict]] = {}
+    for e in existing:
+        if e["subject"] not in scraped:
+            by_subject.setdefault(e["subject"], []).append(e)
+        else:
+            by_subject.setdefault(e["subject"], [])
+    for e in new_entries:
+        by_subject.setdefault(e["subject"], []).append(e)
+    return [e for group in by_subject.values() for e in group]
 
 
 def main():
@@ -481,16 +524,42 @@ def main():
     ap.add_argument("--limit", type=int, default=None, help="only scrape the first N courses per subject (dev)")
     ap.add_argument("--debug", action="store_true", help="print per-course extraction detail")
     ap.add_argument("--refresh", action="store_true", help="ignore the HTML cache and re-fetch")
+    ap.add_argument("--replace", action="store_true",
+                    help="write ONLY the scraped subjects, discarding every other subject "
+                         "already in courses_raw.json (default: merge them in)")
+    ap.add_argument("--allow-partial", action="store_true",
+                    help="write output even if some course pages failed to fetch")
     args = ap.parse_args()
 
-    entries = run(args.subjects, limit=args.limit, debug=args.debug, refresh=args.refresh)
+    failures: list[str] = []
+    entries = run(args.subjects, limit=args.limit, debug=args.debug, refresh=args.refresh,
+                  failures=failures)
+
+    if failures and not args.allow_partial:
+        print("", file=sys.stderr)
+        print("{} course page(s) failed to fetch; NOT writing {} so the dataset "
+              "does not silently lose them:".format(len(failures), RAW_OUTPUT_PATH),
+              file=sys.stderr)
+        for url in failures:
+            print("  " + url, file=sys.stderr)
+        print("Re-run (the cache keeps what succeeded) or pass --allow-partial.",
+              file=sys.stderr)
+        sys.exit(1)
+
+    new_entries = [asdict(e) for e in entries]
+    if RAW_OUTPUT_PATH.exists() and not args.replace:
+        existing = json.loads(RAW_OUTPUT_PATH.read_text(encoding="utf-8"))
+        output = merge_into_existing(new_entries, existing)
+    else:
+        output = new_entries
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
-    RAW_OUTPUT_PATH.write_text(
-        json.dumps([asdict(e) for e in entries], indent=2), encoding="utf-8"
-    )
+    RAW_OUTPUT_PATH.write_text(json.dumps(output, indent=2), encoding="utf-8")
     print("")
-    print("Wrote {} courses -> {}".format(len(entries), RAW_OUTPUT_PATH))
+    print("Wrote {} courses ({} freshly scraped) -> {}".format(
+        len(output), len(new_entries), RAW_OUTPUT_PATH))
+    if failures:
+        print("WARNING: {} course page(s) failed and are missing.".format(len(failures)))
 
     by_subject = {}
     for e in entries:

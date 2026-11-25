@@ -328,5 +328,80 @@ console.log('printable outline has the structure the tree guides need');
     [...discLists].every((u) => !u.closest('.print-tree')), true);
 }
 
+// --- QC regressions ----------------------------------------------------------
+const addCompleted = async (value) => {
+  const input = container.querySelector('input[aria-label="Add a completed course"]');
+  await type(input, value);
+  await act(async () => {
+    input.form.dispatchEvent(new dom.window.Event('submit', { bubbles: true, cancelable: true }));
+  });
+  await flush();
+};
+const chipLabels = () => [...container.querySelectorAll('button[title^="Remove "]')]
+  .map((b) => b.title.replace(/^Remove /, ''));
+
+console.log('the completed-courses box accepts what its placeholder suggests');
+{
+  await click((b) => b.textContent.trim() === 'Clear all');
+  await addCompleted('CMPUT 174, math125; cmput201');
+  check('a comma/semicolon list becomes separate, canonical codes',
+    JSON.stringify(chipLabels()) === JSON.stringify(['CMPUT 174', 'MATH 125', 'CMPUT 201']),
+    JSON.stringify(chipLabels()));
+  await addCompleted('CMPUT 175, hello');
+  check('a non-code is reported, not stored',
+    text().includes('Not a course code, so not added: hello') && !chipLabels().includes('HELLO'));
+  check('the valid part of a mixed entry is still added', chipLabels().includes('CMPUT 175'));
+  check('the rejected text stays in the box to fix',
+    container.querySelector('input[aria-label="Add a completed course"]').value === 'hello');
+  await click((b) => b.textContent.trim() === 'Clear all');
+}
+
+console.log('the viewed course lives in the URL');
+{
+  const shown = container.querySelector('article h2').textContent.split(' — ')[0];
+  check('the hash names the course on screen',
+    decodeURIComponent(window.location.hash) === '#/course/' + shown,
+    window.location.hash + ' vs ' + shown);
+  await act(async () => {
+    window.history.pushState(null, '', '#/course/' + encodeURIComponent('MATH 228'));
+    window.dispatchEvent(new dom.window.PopStateEvent('popstate'));
+  });
+  await flush();
+  check('navigating the hash (back/forward, a shared link) changes the course',
+    text().includes('MATH 228 —'), text().slice(0, 200));
+}
+
+console.log('an "A, B or C" list reads as a choice (MATH 228)');
+{
+  const t = text();
+  check('MATH 228 offers one of three', t.includes('ANY ONE of these'));
+  check('MATH 228 does not demand MATH 102 on top', !t.includes('ALL of these'));
+}
+
+console.log('a faithful catalogue loop is a neutral note, not a red error');
+{
+  await act(async () => {
+    window.history.pushState(null, '', '#/course/' + encodeURIComponent('MATH 337'));
+    window.dispatchEvent(new dom.window.PopStateEvent('popstate'));
+  });
+  await flush();
+  const t = text();
+  check('the loop is explained', t.includes('loops back to'), t.slice(0, 300));
+  // (The disclaimer legitimately says "parsing errors ... are possible".)
+  check('it is not called a parse error',
+    !t.includes('likely wrong') && !t.includes('lists itself as its own prerequisite'));
+  check('no red error panel', !container.querySelector('.bg-rose-50 p + p, .border-rose-300 > p'));
+}
+
+console.log('search says when results are truncated');
+{
+  await type(container.querySelector('input[aria-label="Search courses"]'), '');
+  check('truncation notice shown for the full list',
+    /Showing 40 of \d+/.test(text()), text().match(/Showing[^—]*/)?.[0]);
+  await type(container.querySelector('input[aria-label="Search courses"]'), 'cmput301');
+  check('a code typed without its space still matches',
+    [...container.querySelectorAll('button')].some((b) => b.textContent.includes('CMPUT 301')));
+}
+
 console.log('\n' + passed + ' passed, ' + failed + ' failed');
 process.exit(failed ? 1 : 0);

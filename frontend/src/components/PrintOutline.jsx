@@ -1,5 +1,4 @@
-import React from 'react';
-import { describeRequirement } from '../lib/evalEngine.js';
+import { describeRequirement, levelLabel } from '../lib/evalEngine.js';
 import { isFlat } from './CoreqLine.jsx';
 
 /** "MATH 209 or MATH 214", with the same [x]/[ ] convention as the outline. */
@@ -7,7 +6,7 @@ function flatToSentence(node) {
   const leaf = (n) => {
     const mark = n.satisfied ? '[x] ' : '[ ] ';
     if (n.type === 'LEVEL_MIN') {
-      return mark + 'any ' + n.min_level + '-level ' + n.subject + ' course';
+      return mark + 'any ' + n.min_level + '-level ' + levelLabel(n) + ' course';
     }
     return mark + n.code + (n.external ? ' (not tracked here)' : '');
   };
@@ -40,6 +39,7 @@ function OutlineNode({ node, unparsed = false }) {
         {node.satisfied ? '[x] ' : '[ ] '}
         {node.code}
         {node.external ? ' — not tracked in this dataset; verify yourself' : ''}
+        {node.cycle ? ' — loops back to a course already on this path; not a usable route here' : ''}
         {node.chain && !node.satisfied && (
           <>
             {/* Kept OUTSIDE the nested <ul> on purpose: it is a caption, not a
@@ -57,7 +57,7 @@ function OutlineNode({ node, unparsed = false }) {
     return (
       <li>
         {node.satisfied ? '[x] ' : '[ ] '}
-        any {node.min_level}-level {node.subject} course
+        any {node.min_level}-level {levelLabel(node)} course
       </li>
     );
   }
@@ -75,6 +75,9 @@ function OutlineNode({ node, unparsed = false }) {
 
 export default function PrintOutline({ result }) {
   const { course, prerequisite, corequisite, remaining, conflicts, blocked } = result;
+  // The engine already defaults these; the printout must not crash on a
+  // record that lacks them either.
+  const notes = result.notes || course.notes || [];
 
   return (
     <div className="print-only print-outline">
@@ -157,11 +160,11 @@ export default function PrintOutline({ result }) {
         </>
       )}
 
-      {course.notes.length > 0 && (
+      {notes.length > 0 && (
         <>
           <h2 className="mt-4 font-semibold">Notes not modelled in the diagram</h2>
           <ul className="ml-5 list-disc">
-            {course.notes.map((n, i) => (
+            {notes.map((n, i) => (
               <li key={i}>{n}</li>
             ))}
           </ul>

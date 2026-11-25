@@ -167,11 +167,11 @@ BARE_NUMBER_RE = re.compile(r"^" + _NUMBER + r"$")
 #   subject     a CODE ("MATH") as well as a spelled name ("Computing Science")
 #   noun        "course" or "class" ("any 300-level MATH class", MATH 421)
 LEVEL_MIN_RE = re.compile(
-    r"^(?:any|a|an|the|one|another)?\s*(\d)00-level\s+(.+?)\s+(?:course|class)$", re.I
+    r"^(?:any|a|an|the|one|another)?\s*(\d)00\s*-?\s*level\s+(.+?)\s+(?:course|class)$", re.I
 )
 # "any 200-level course" -- no subject named at all.
 LEVEL_MIN_NO_SUBJECT_RE = re.compile(
-    r"^(?:any|a|an|the|one|another)?\s*(\d)00-level\s+(?:course|class)$", re.I
+    r"^(?:any|a|an|the|one|another)?\s*(\d)00\s*-?\s*level\s+(?:course|class)$", re.I
 )
 
 # Spelled-out subject names appearing directly in course references. CMPUT
@@ -189,7 +189,8 @@ SPELLED_SUBJECT_RE = re.compile(
 
 
 def normalize_spelled_subjects(text: str) -> str:
-    """'Pure Mathematics 30 or Mathematics 30-1' -> 'PURE MATH 30 or MATH 30-1'.
+    """'Pure Mathematics 30 or Mathematics 30-1' -> 'PURE MATH 30 or MATH 30-1',
+    and 'Chem 361' -> 'CHEM 361'.
 
     Only rewrites a name immediately followed by a number, so prose like
     "reasoning in mathematics" is left alone.
@@ -197,7 +198,24 @@ def normalize_spelled_subjects(text: str) -> str:
     def sub(m):
         return SUBJECT_NAME_TO_CODE[m.group(1).lower()] + " "
 
-    return SPELLED_SUBJECT_RE.sub(sub, text)
+    text = SPELLED_SUBJECT_RE.sub(sub, text)
+
+    # Title-case subject CODES: CHEM 460 writes "Chem 361". The vocabulary is
+    # upper-case, so "Chem" was not a subject, the number inherited the home
+    # subject, and the requirement became a different course. Only a
+    # Capitalised word that IS a registry code and is followed by a course
+    # number is rewritten, so ordinary prose is untouched.
+    def upcase(m):
+        word = m.group(1)
+        return word.upper() if word.upper() in SUBJECT_CODES else word
+
+    return _TITLE_CASE_CODE_RE.sub(upcase, text)
+
+
+_TITLE_CASE_CODE_RE = re.compile(r"\b([A-Z][a-z]{2,5})(?=\s+\d{2,3}\b)")
+
+_SLASH_LIST_RE = re.compile(r"(?<=\d)\s*/\s*(?=(?:[A-Z]{2,6}(?: [A-Z]{1,4})?\s*)?\d{2,3}\b)")
+_CONNECTOR_COMMA_RE = re.compile(r"\b(and|or),(?=\s)", re.I)
 
 # Atoms that carry real meaning for a human but cannot become graph nodes.
 # DESIGN.md non-goals: minimum grades / instructor permission are stored as
@@ -219,6 +237,10 @@ INFORMATIONAL_RE = re.compile(
     r")\.?$",
     re.I,
 )
+
+_GRADE = r"(?:a\s+)?(?:minimum\s+)?grade\s+of\s+(?:at\s+least\s+)?[A-D][+-]?(?:\s+or\s+(?:better|higher|above))?"
+GRADE_SUFFIX_RE = re.compile(r"^(?P<course>.+?)\s+with\s+" + _GRADE + r"\.?$", re.I)
+GRADE_PREFIX_RE = re.compile(r"^" + _GRADE + r"\s+in\s+(?P<course>.+?)\.?$", re.I)
 
 # Whole-sentence shapes that mean "there is no fixed prerequisite list".
 VARIES_RE = re.compile(
@@ -242,8 +264,13 @@ PAREN_ASIDE_RE = re.compile(r"\s*\(([^)]*)\)|\s*\[([^\]]*)\]")
 # alternatives with numbered markers or condition them on other courses; a
 # wrong tree here would be stated with the same confidence as a right one, so
 # these degrade to `unparsed` and the UI falls back to the calendar text.
+#
+# "except" inverts everything after it: INT D 420's "All courses in the BScN
+# program except NURS 422, NURS 425 and NURS 485" shipped a tree REQUIRING
+# NURS 425 and 485 -- the exact opposite of the text. "All courses in a
+# program" is not expressible in this schema anyway, so refuse.
 TOO_COMPLEX_RE = re.compile(
-    r"\(\s*\d\s*\)\s*\w|when combined with|as needed|varies", re.I
+    r"\(\s*\d\s*\)\s*\w|when combined with|as needed|varies|\bexcept\b", re.I
 )
 
 # MATH writes the label three ways: "Prerequisite:", "Prerequisite :" (MATH 327)
@@ -329,7 +356,12 @@ def normalize_subject(subject: str) -> str:
 # ---------------------------------------------------------------------------
 
 # Numbers that must NOT be read as course references.
-_SKIP_NUMBER_CONTEXT_RE = re.compile(r"^\s*(?:-level|-year|\s*\))", re.I)
+# "300-level", "300 level", "300- level" (CHEM 405), "-year", "(1)", and
+# quantities rather than courses: "30 units" (INT D 301), "60 credits", "3.0".
+# Without the quantity forms, "a minimum of 30 units" became a course "CMPUT 30".
+_SKIP_NUMBER_CONTEXT_RE = re.compile(
+    r"^\s*(?:-?\s*level\b|-year|\s*\)|units?\b|credits?\b|%|\.\d)", re.I
+)
 
 
 def expand_bare_numbers(text: str, home_subject: str = CMPUT_SUBJECT) -> str:
@@ -378,6 +410,8 @@ class ParseContext:
     home_subject: str = CMPUT_SUBJECT
     dropped: list = field(default_factory=list)   # informational atoms dropped
     unrecognized: list = field(default_factory=list)  # atoms we could not classify
+    # Comma lists whose AND/OR reading the punctuation does not settle.
+    ambiguous: list = field(default_factory=list)
 
 
 # Ordered outermost-first. See the module docstring on why the comma matters.
@@ -387,15 +421,80 @@ class ParseContext:
 # OR -- the comma there is a requirement separator, not a list separator. It
 # sits below ", or" and above bare "and"/"or" because it binds looser than
 # either keyword but tighter than a comma-prefixed one.
+#
+# The level between ", or" and the bare comma -- a bare " and " that opens a
+# new "one of"/"either"/"both" scope -- exists for ASTRO 320:
+#     "MATH 101, 115, 118, 136, 146 or 156 and one of PHYS 208 or 271"
+# The " and one of" is the real top-level join. Left to the bare-comma level,
+# the comma split ran first and stranded "156 and one of ..." in the last list
+# item, turning a two-way AND into "MATH 101 and 115 and 118 and ...".
+#
+# Level 0 also splits on a sentence boundary. The scraper joins every
+# prerequisite sentence a description holds, so BIOL 392 arrives as
+# "BIOL 207 and BIOL 208. Pre-requisite: BIOL 380." -- without this the
+# period glued "208. Pre-requisite: BIOL 380" into one unparseable atom and
+# both courses vanished from the tree.
 _SPLIT_LEVELS = [
-    (re.compile(r"\s*;\s*"), "AND"),
+    (re.compile(r"\s*;\s*|(?<=[a-z0-9)\]])\.\s+(?=[A-Z])"), "AND"),
     (re.compile(r"\s*,\s+and\s+", re.I), "AND"),
     (re.compile(r"\s*,\s+or\s+", re.I), "OR"),
+    (re.compile(r"\s+and\s+(?=(?:at\s+least\s+)?(?:one|any)\s+of\b|either\b|both\b)", re.I), "AND"),
     (re.compile(r"\s*,\s*"), "AND"),
     (re.compile(r"\s+and\s+", re.I), "AND"),
     (re.compile(r"\s+or\s+", re.I), "OR"),
 ]
 _COMMA_CONNECTOR_LEVELS = (1, 2)  # levels whose fragments may be comma lists
+_BARE_COMMA_LEVEL = 4
+
+# ---------------------------------------------------------------------------
+# "A, B or C" -- the trailing-OR list.
+#
+# A bare comma usually separates requirements ("CMPUT 204 or 275, 301" needs
+# 301 as well as one of 204/275). But English also writes an OR list with no
+# serial comma: "MATH 102, 125 or 127" means any one of the three. Reading
+# every bare comma as AND turned that into "MATH 102 AND (125 OR 127)" and
+# shipped it as `parsed`, so the coverage audit (which compares code SETS,
+# not operators) could never see it.
+#
+# The shape that settles it: every item before the last is a single course,
+# and the last item is exactly "X or Y" of two courses.
+#   * All in one subject -> an OR list. That is how the catalogue writes
+#     alternatives within a department ("MATH 102, 125 or 127").
+#   * Mixed subjects ("PSYCH 212, PSYCH 213 or STAT 151") -> genuinely
+#     ambiguous: it is often "212 AND (213 OR STAT 151)". We keep the AND
+#     reading (the conservative direction -- never tells a student LESS is
+#     needed) but flag it, so the course is `partial` and the UI declines to
+#     say "eligible" and points to the calendar.
+# A last item with several "or"s ("PHYS 271, MATH 334 or 336 or 201") is its
+# own OR group and stays ANDed with the rest; the rule does not fire.
+# ---------------------------------------------------------------------------
+
+def _single_code(fragment: str):
+    m = COURSE_CODE_FULL_RE.match(_LEADING_CONNECTOR_RE.sub("", fragment.strip().strip(".;, ")))
+    return m
+
+
+def _trailing_or_list(parts: list):
+    """Returns ("OR", items) for an unambiguous "A, B or C" list,
+    ("AMBIGUOUS", None) for the mixed-subject shape, or (None, None)."""
+    if len(parts) < 2:
+        return None, None
+    heads = [_single_code(p) for p in parts[:-1]]
+    if not all(heads):
+        return None, None
+    last = parts[-1].strip().strip(".;, ")
+    if re.search(r"\s+and\s+", last, re.I):
+        return None, None
+    tail = re.split(r"\s+or\s+", last, flags=re.I)
+    if len(tail) != 2:
+        return None, None
+    tails = [_single_code(t) for t in tail]
+    if not all(tails):
+        return None, None
+    subjects = {normalize_subject(m.group(1)) for m in heads + tails}
+    if len(subjects) == 1:
+        return "OR", [p for p in parts[:-1]] + tail
+    return "AMBIGUOUS", None
 
 # ---------------------------------------------------------------------------
 # "one of ..." is a bracket, not a filler phrase.
@@ -421,8 +520,10 @@ _COMMA_CONNECTOR_LEVELS = (1, 2)  # levels whose fragments may be comma lists
 #   "any of ..."
 # The "at least" prefix has to be inside the pattern rather than stripped
 # separately, or the scope starts at "one" and leaves a dangling "at least".
+# "any one of" (BIOL 531, ENT 327) must be matched whole too: matching only
+# "one of" left a stray "any" that stopped the whole list from parsing.
 _ONE_OF_RE = re.compile(
-    r"\b(?:at\s+least\s+)?(?:one|any)\s+of\b|\beither\b", re.I
+    r"\b(?:at\s+least\s+|any\s+)?(?:one|any)\s+of\b|\beither\b", re.I
 )
 
 # A one-of list ends at ';', at ', and ', or -- the MATH 348 case -- at a bare
@@ -511,12 +612,27 @@ _COMMA_RE = re.compile(r"\s*,\s*")
 # and would otherwise stop the atom from matching a course code.
 _LEADING_CONNECTOR_RE = re.compile(r"^(?:and|or)\s+", re.I)
 _HAS_CONNECTOR_RE = re.compile(r"\s+(?:and|or)\s+", re.I)
+# "Prerequisite or corequisite:", "Corequisite:", and CHEM 267's spaced-out
+# "Prerequisite or co- requisite:".
+_COREQ_FRAGMENT_RE = re.compile(
+    r"^(?:pre-?\s*requisites?\s+or\s+)?co-?\s*requisites?\s*:?", re.I
+)
 
 
 def _parse_expr(text: str, ctx: ParseContext, level: int = 0):
     text = _LEADING_CONNECTOR_RE.sub("", text.strip().strip(".;, ")).strip()
     if not text:
         return None
+
+    # A later sentence may open with its own field label. "Prerequisite or
+    # corequisite: CHEM 265" may be taken alongside, so it is never a hard
+    # gate (rule R5) -- note it and leave it out of the tree.
+    if _COREQ_FRAGMENT_RE.match(text):
+        ctx.dropped.append("may be taken as a corequisite, not required beforehand: " + text)
+        return None
+    stripped = PREREQ_LABEL_RE.sub("", text)
+    if stripped != text:
+        return _parse_expr(stripped, ctx, level)
 
     # A fragment that is entirely a "one of ..." list is an OR over every item,
     # regardless of how its commas and "or"s are arranged.
@@ -538,6 +654,13 @@ def _parse_expr(text: str, ctx: ParseContext, level: int = 0):
             if any(_LEADING_CONNECTOR_RE.match(p.strip()) and
                    p.strip().lower().startswith("or ") for p in parts[1:]):
                 kind = "OR"
+
+        if i == _BARE_COMMA_LEVEL:
+            shape, items = _trailing_or_list(parts)
+            if shape == "OR":
+                kind, parts = "OR", items
+            elif shape == "AMBIGUOUS":
+                ctx.ambiguous.append(text)
 
         children = []
         for part in parts:
@@ -580,7 +703,12 @@ def _parse_atom(text: str, ctx: ParseContext):
         if not subject_code and re.fullmatch(_SUBJECT, raw_subject):
             subject_code = normalize_subject(raw_subject)
         if subject_code:
-            return level_min_node(int(m.group(1)) * 100, subject_code)
+            node = level_min_node(int(m.group(1)) * 100, subject_code)
+            spans = _subjects.DEPARTMENT_SUBJECTS.get(raw_subject.lower())
+            if spans:
+                node["subjects"] = list(spans)
+                node["label"] = raw_subject
+            return node
         ctx.unrecognized.append(text)
         return None
 
@@ -601,11 +729,30 @@ def _parse_atom(text: str, ctx: ParseContext):
         if len(parts) > 1:
             return and_node(parts)
 
+    # "CMPUT 175 with a minimum grade of C-" / "a minimum grade of C- in
+    # CMPUT 175": the GRADE is informational (DESIGN.md non-goals), the COURSE
+    # is not. The informational rule below used to match the whole fragment
+    # and drop the course with it -- an under-constrained tree that still let
+    # the engine say "eligible".
+    m = GRADE_SUFFIX_RE.match(text) or GRADE_PREFIX_RE.match(text)
+    if m:
+        inner = _parse_atom(m.group("course"), ctx)
+        if inner is not None:
+            ctx.dropped.append(text.strip() + " (minimum grade not enforced)")
+            return inner
+
     m = COURSE_CODE_FULL_RE.match(text)
     if m and not _is_connector(m.group(1)):
         return course_node(m.group(1), m.group(2), ctx.home_subject)
 
     if INFORMATIONAL_RE.match(text):
+        if COURSE_CODE_RE.search(text):
+            # An "informational" fragment that names a course is never safe to
+            # drop quietly: whatever it says about that course, the tree no
+            # longer reflects it. Record it as unrepresented so the UI says the
+            # tree is incomplete instead of implying it is whole.
+            ctx.unrecognized.append(text)
+            return None
         ctx.dropped.append(text)
         return None
 
@@ -636,12 +783,25 @@ def parse_prerequisite_text(text: Optional[str], home_subject: str = CMPUT_SUBJE
         return empty  # field absent entirely
 
     normalized = re.sub(r"\s+", " ", text).strip()
-    normalized = PREREQ_OR_COREQ_LABEL_RE.sub("", normalized)  # before the two below
-    normalized = PREREQ_LABEL_RE.sub("", normalized)
-    normalized = COREQ_LABEL_RE.sub("", normalized)
+    # Strip leading labels until none is left: PHYS 181's source text really
+    # says "Prerequisite: Prerequisite: PHYS 124 ...", and a single pass left
+    # the second label glued to PHYS 124, which then failed to parse.
+    while True:
+        before = normalized
+        normalized = PREREQ_OR_COREQ_LABEL_RE.sub("", normalized)  # before the two below
+        normalized = PREREQ_LABEL_RE.sub("", normalized)
+        normalized = COREQ_LABEL_RE.sub("", normalized)
+        if normalized == before:
+            break
     # "Pure Mathematics 30 or Mathematics 30-1" -> "PURE MATH 30 or MATH 30-1",
     # so the same high-school course is one node no matter how it is spelled.
     normalized = normalize_spelled_subjects(normalized)
+    # Slash lists are OR lists: "MATH 100/114/117" (BIOPH 201). Only a slash
+    # between course numbers is rewritten -- "and/or" is left alone.
+    normalized = _SLASH_LIST_RE.sub(" or ", normalized)
+    # A stray comma after a connector is a source typo, not punctuation that
+    # carries grouping: PSYCH 315's "PSYCH 212 and, PSYCH 213 or STAT 151".
+    normalized = _CONNECTOR_COMMA_RE.sub(r"\1 ", normalized)
     normalized = normalized.strip()
 
     if not normalized or NONE_TEXT_RE.match(normalized):
@@ -684,7 +844,7 @@ def parse_prerequisite_text(text: Optional[str], home_subject: str = CMPUT_SUBJE
             "credit_exclusion_candidates": [],
         }
 
-    negated, kept = _strip_negated_sentences(normalized)
+    negated, kept = _strip_negated_sentences(normalized, home_subject)
     if not kept:
         return {
             "tree": None,
@@ -700,10 +860,16 @@ def parse_prerequisite_text(text: Optional[str], home_subject: str = CMPUT_SUBJE
     notes.extend("not required, mentioned only as an aside: " + a for a in asides)
     if ctx.unrecognized:
         notes.extend("could not interpret: " + u for u in ctx.unrecognized)
+    if ctx.ambiguous:
+        notes.extend(
+            "ambiguous grouping, read as ALL of the listed courses (check the "
+            "calendar -- it may mean any one of them): " + a
+            for a in ctx.ambiguous
+        )
 
     if tree is None:
         status = "unparsed"
-    elif ctx.dropped or ctx.unrecognized or asides:
+    elif ctx.dropped or ctx.unrecognized or ctx.ambiguous or asides:
         status = "partial"
     else:
         status = "parsed"
@@ -718,12 +884,16 @@ def parse_prerequisite_text(text: Optional[str], home_subject: str = CMPUT_SUBJE
         # from `notes` (which also carries harmless drops like "consent of the
         # Department") so the UI can tell the two cases apart: one means the
         # tree is incomplete, the other does not.
-        "unrepresented": list(ctx.unrecognized),
+        #
+        # An ambiguous list grouping counts too: the tree states one reading
+        # with full confidence, so the UI must not report "eligible" on it.
+        "unrepresented": list(ctx.unrecognized)
+        + ["ambiguous grouping: " + a for a in ctx.ambiguous],
         "credit_exclusion_candidates": negated,
     }
 
 
-def _strip_negated_sentences(text: str):
+def _strip_negated_sentences(text: str, home_subject: str = CMPUT_SUBJECT):
     """Drop any sentence carrying a negation cue, capturing the course codes it
     mentioned as credit-exclusion candidates instead of letting them reach the
     requirement parser. Returns (excluded_codes, kept_text)."""
@@ -732,20 +902,30 @@ def _strip_negated_sentences(text: str):
     for sentence in sentences:
         lowered = sentence.lower()
         if any(cue in lowered for cue in NEGATION_CUES):
-            excluded.extend(_codes_in(sentence))
+            excluded.extend(_codes_in(sentence, home_subject))
         else:
             kept.append(sentence)
     return excluded, " ".join(kept).strip()
 
 
-def _codes_in(text: str) -> list:
+def _codes_in(text: str, home_subject: str = CMPUT_SUBJECT) -> list:
     """Every course code in a fragment, with bare numbers resolved against the
-    last subject seen (same list grammar as prerequisites)."""
+    last subject seen (same list grammar as prerequisites).
+
+    `home_subject` is the subject a leading bare number belongs to -- the
+    course's OWN subject. Defaulting it to CMPUT for every course read
+    CHEM 460's "Chem 361" as CMPUT 361."""
     codes = []
-    for m in COURSE_CODE_RE.finditer(expand_bare_numbers(text)):
+    expanded = expand_bare_numbers(text, home_subject)
+    for m in COURSE_CODE_RE.finditer(expanded):
         if _is_connector(m.group(1)):
             continue
-        after = text[m.end(2):] if m.end(2) <= len(text) else ""
+        # Offsets come from the EXPANDED string, so the context check must
+        # slice that string too. Slicing the original (which is shorter by
+        # every subject prefix the expansion inserted) checked the wrong
+        # characters and silently dropped codes -- "CMPUT 301, 302 (Fall)"
+        # lost 302 because the misaligned slice landed on ")".
+        after = expanded[m.end(2):]
         if _SKIP_NUMBER_CONTEXT_RE.match(after):
             continue
         code = normalize_subject(m.group(1)) + " " + m.group(2)
@@ -754,7 +934,8 @@ def _codes_in(text: str) -> list:
     return codes
 
 
-def extract_credit_exclusions(exclusion_text: Optional[str], self_code: Optional[str] = None) -> list:
+def extract_credit_exclusions(exclusion_text: Optional[str], self_code: Optional[str] = None,
+                              home_subject: str = CMPUT_SUBJECT) -> list:
     """Pull course codes out of credit-exclusion sentences such as
         "Credit may be obtained in only one of CMPUT 301, BTM 419, or MIS 419."
         "Credit cannot be obtained for both CMPUT 174 and CMPUT 274."
@@ -763,7 +944,7 @@ def extract_credit_exclusions(exclusion_text: Optional[str], self_code: Optional
     301 itself, which is not an exclusion *for* 301."""
     if not exclusion_text:
         return []
-    codes = _codes_in(exclusion_text)
+    codes = _codes_in(normalize_spelled_subjects(exclusion_text), home_subject)
     if self_code:
         codes = [c for c in codes if c != self_code]
     return codes

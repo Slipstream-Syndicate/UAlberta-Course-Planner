@@ -56,14 +56,13 @@ for (const c of courses) {
     fail(c.code, 'not found by its own code');
     continue;
   }
-  // A guarded cycle is expected in real data, not a failure: MA PH 351 and
-  // MATH 337 each list the other as one OR alternative, and ~26 PHYS/GEOPH/
-  // MATH courses reach that pair transitively. The engine catching it and
-  // continuing is the behaviour we want; only a NEW kind of error is a bug.
-  const nonCycle = cold.errors.filter((e) => !/cycle detected/.test(e));
-  if (nonCycle.length) {
-    fail(c.code, 'evaluation raised: ' + nonCycle.join('; '));
-  } else if (cold.errors.length) {
+  // A loop is expected in real data, not a failure: MA PH 351 and MATH 337
+  // each list the other as one OR alternative, and ~26 PHYS/GEOPH/MATH courses
+  // reach that pair transitively. The engine reports those in `cycles`, never
+  // in `errors`, so ANY error here is a bug.
+  if (cold.errors.length) {
+    fail(c.code, 'evaluation raised: ' + cold.errors.join('; '));
+  } else if (cold.cycles.length) {
     guarded.add(c.code);
   }
 

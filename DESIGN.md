@@ -1,5 +1,13 @@
 # CMPUT Prerequisite & Course Planning Explorer
 
+> **Status note.** This is the original v1 design record and is kept as
+> written, because the reasoning in it still governs the code. Scope has since
+> grown past it: all 31 Faculty of Science subjects are scraped (Phase 5), and
+> the app is now the *UAlberta* Prerequisite Explorer. Where this document and
+> the code differ, [README.md](README.md) describes what is actually built —
+> notably the closed subject vocabulary, the trailing-OR list rule, loops as
+> dead-end branches rather than errors, and the absence of the LLM fallback.
+
 ## What this is
 
 Originally scoped as a rebuild of an old resume project (a UAlberta final-exam scraper + calendar sync tool). Pivoted after realizing that project wasn't actually "scheduling" anything — exams are fixed by the registrar, so the old idea was really a lookup/aggregation tool wearing a scheduler's name. This project earns the name: it scrapes UAlberta's course catalogue, parses prerequisite requirements (which are genuinely boolean logic, not a simple chain), and lets a student ask "what are my options to get into course X" given what they've already completed.
